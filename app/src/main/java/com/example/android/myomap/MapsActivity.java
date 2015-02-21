@@ -30,6 +30,7 @@ public class MapsActivity extends ActionBarActivity {
     private TextView mGestureTextView;
     private TextView mLockStateTextView;
     private TextView mRpyTextView;
+    private Arm mArm;
     private float mRoll;
     private float mPitch;
     private float mYaw;
@@ -75,13 +76,19 @@ public class MapsActivity extends ActionBarActivity {
         // arm. This lets Myo know which arm it's on and which way it's facing.
         @Override
         public void onArmSync(Myo myo, long timestamp, Arm arm, XDirection xDirection) {
-            mGestureTextView.setText(myo.getArm() == Arm.LEFT ? R.string.arm_left : R.string.arm_right);
+            mArm = myo.getArm();
+            if (mArm == Arm.LEFT){
+                mGestureTextView.setText(R.string.arm_left);
+            } else {
+                mGestureTextView.setText(R.string.arm_right);
+            }
         }
         // onArmUnsync() is called whenever Myo has detected that it was moved from a stable position on a person's arm after
         // it recognized the arm. Typically this happens when someone takes Myo off of their arm, but it can also happen
         // when Myo is moved around on the arm.
         @Override
         public void onArmUnsync(Myo myo, long timestamp) {
+            mArm = Arm.UNKNOWN;
             mGestureTextView.setText(R.string.hello_world);
         }
         // onUnlock() is called whenever a synced Myo has been unlocked. Under the standard locking
