@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">MyoMap</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="arm_left">Left arm</string>
+    <string name="arm_right">Right arm</string>
+    <string name="locked">Locked</string>
+    <string name="unlocked">unLocked</string>
+    <string name="pose_fist">Fist</string>
+    <string name="pose_wavein">Wave in</string>
+    <string name="pose_waveout">Wave out</string>
+    <string name="pose_fingersspread">Fingers spread</string>
+</resources>
