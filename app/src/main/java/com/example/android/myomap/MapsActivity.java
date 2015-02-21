@@ -2,7 +2,6 @@ package com.example.android.myomap;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -26,6 +25,28 @@ import com.thalmic.myo.XDirection;
 import com.thalmic.myo.scanner.ScanActivity;
 
 public class MapsActivity extends ActionBarActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_maps);
+
+        mLockStateView = (TextView) findViewById(R.id.lock_textview);
+        mTextView = (TextView) findViewById(R.id.gesture_textview);
+
+        // First, we initialize the Hub singleton with an application identifier.
+        Hub hub = Hub.getInstance();
+        if (!hub.init(this, getPackageName())) {
+            // We can't do anything with the Myo device if the Hub can't be initialized, so exit.
+            Toast.makeText(this, "Couldn't initialize Hub", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+        // Next, register for DeviceListener callbacks.
+        hub.addListener(mListener);
+
+        setUpMapIfNeeded();
+    }
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private TextView mTextView;
@@ -84,11 +105,13 @@ public class MapsActivity extends ActionBarActivity {
                 roll *= -1;
                 pitch *= -1;
             }
-            mMap.animateCamera(CameraUpdateFactory.scrollBy(roll, pitch));
+            //mMap.animateCamera(CameraUpdateFactory.scrollBy(roll, pitch));
             // Next, we apply a rotation to the text view using the roll, pitch, and yaw.
-            mTextView.setRotation(roll);
-            mTextView.setRotationX(pitch);
-            mTextView.setRotationY(yaw);
+
+            //annoying rotation
+            //mTextView.setRotation(roll);
+            //mTextView.setRotationX(pitch);
+            //mTextView.setRotationY(yaw);
         }
         // onPose() is called whenever a Myo provides a new pose.
         @Override
@@ -144,27 +167,6 @@ public class MapsActivity extends ActionBarActivity {
         }
     };
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
-
-        mLockStateView = (TextView) findViewById(R.id.lock_state);
-        mTextView = (TextView) findViewById(R.id.text);
-
-        // First, we initialize the Hub singleton with an application identifier.
-        Hub hub = Hub.getInstance();
-        if (!hub.init(this, getPackageName())) {
-            // We can't do anything with the Myo device if the Hub can't be initialized, so exit.
-            Toast.makeText(this, "Couldn't initialize Hub", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
-        // Next, register for DeviceListener callbacks.
-        hub.addListener(mListener);
-
-        setUpMapIfNeeded();
-    }
 
     @Override
     protected void onResume() {
