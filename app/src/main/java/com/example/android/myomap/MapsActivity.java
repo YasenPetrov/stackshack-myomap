@@ -1,13 +1,12 @@
 package com.example.android.myomap;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,7 +25,6 @@ import com.thalmic.myo.XDirection;
 import com.thalmic.myo.scanner.ScanActivity;
 
 public class MapsActivity extends ActionBarActivity {
-    protected PowerManager.WakeLock mWakeLock;
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private TextView mGestureTextView;
@@ -57,9 +55,7 @@ public class MapsActivity extends ActionBarActivity {
         // Next, register for DeviceListener callbacks.
         hub.addListener(mListener);
         setUpMap();
-        final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        this.mWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag");
-        this.mWakeLock.acquire();
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
 
@@ -210,7 +206,6 @@ public class MapsActivity extends ActionBarActivity {
 
     @Override
     protected void onDestroy() {
-        this.mWakeLock.release();
         super.onDestroy();
         // We don't want any callbacks when the Activity is gone, so unregister the listener.
         Hub.getInstance().removeListener(mListener);
