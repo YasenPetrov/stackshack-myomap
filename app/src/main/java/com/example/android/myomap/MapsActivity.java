@@ -118,6 +118,14 @@ public class MapsActivity extends ActionBarActivity {
 
                 mRpyTextView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nyaw: " + mYaw);
             }
+
+             if(myo.getPose() == Pose.FINGERS_SPREAD) {
+                 float relYaw = 90 - mYaw;
+                 mMap.animateCamera(CameraUpdateFactory.scrollBy(0, mPitch * 100));
+             }
+//            mMap.animateCamera(CameraUpdateFactory.scrollBy(roll, pitch));
+            // Next, we apply a rotation to the text view using the roll, pitch, and yaw.
+            mRpyTextView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nyaw: " + mYaw);
         }
         // onPose() is called whenever a Myo provides a new pose.
         @Override
@@ -147,11 +155,11 @@ public class MapsActivity extends ActionBarActivity {
                         mGestureTextView.setText(getString(R.string.pose_fist));
                         break;
                     case WAVE_IN:
-                        mMap.animateCamera(CameraUpdateFactory.zoomOut());
+                        //mMap.animateCamera(CameraUpdateFactory.zoomOut());
                         mGestureTextView.setText(getString(R.string.pose_wavein));
                         break;
                     case WAVE_OUT:
-                        mMap.animateCamera(CameraUpdateFactory.scrollBy(((float) 60.5), (float) 45.5));
+                        //mMap.animateCamera(CameraUpdateFactory.scrollBy(((float) 60.5), (float) 45.5));
                         mGestureTextView.setText(getString(R.string.pose_waveout));
                         break;
                     case FINGERS_SPREAD:
