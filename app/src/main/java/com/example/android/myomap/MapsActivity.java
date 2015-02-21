@@ -34,6 +34,8 @@ public class MapsActivity extends ActionBarActivity {
     private float mRoll;
     private float mPitch;
     private float mYaw;
+    private boolean mUpdateCenterYaw = false;
+    private float mCenterYaw;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +115,10 @@ public class MapsActivity extends ActionBarActivity {
             mRoll = (float) Math.toDegrees(Quaternion.roll(rotation));
             mPitch = (float) Math.toDegrees(Quaternion.pitch(rotation));
             mYaw = (float) Math.toDegrees(Quaternion.yaw(rotation));
+            if (mUpdateCenterYaw){
+                mUpdateCenterYaw = false;
+                mCenterYaw = mYaw;
+            }
             // Adjust roll and pitch for the orientation of the Myo on the arm.
             if (myo.getXDirection() == XDirection.TOWARD_ELBOW) {
                 mRoll *= -1;
@@ -129,8 +135,12 @@ public class MapsActivity extends ActionBarActivity {
             }
 
              if(myo.getPose() == Pose.FINGERS_SPREAD) {
-                 float relYaw = 90 - mYaw;
-                 mMap.animateCamera(CameraUpdateFactory.scrollBy(0, mPitch * 100));
+                 float relYaw = mYaw - mCenterYaw;
+                //TODO FIX PLS YASEN
+                // Creates a CameraPosition from the builder
+                 mMap.animateCamera(CameraUpdateFactory.scrollBy(relYaw / 10, mPitch * 100));
+
+                 //mMap.animateCamera
              }
 //            mMap.animateCamera(CameraUpdateFactory.scrollBy(roll, pitch));
             // Next, we apply a rotation to the text view using the roll, pitch, and yaw.
@@ -174,6 +184,7 @@ public class MapsActivity extends ActionBarActivity {
                     case FINGERS_SPREAD:
                         //mMap.animateCamera(CameraUpdateFactory.scrollBy(((float) -60.5), (float) -45.5));
                         mGestureTextView.setText(getString(R.string.pose_fingersspread));
+                        mUpdateCenterYaw = true;
                         break;
                 }
             }
@@ -192,6 +203,8 @@ public class MapsActivity extends ActionBarActivity {
         }
     };
 
+    private void getCurrentYaw(){
+    }
 
     @Override
     protected void onResume() {
