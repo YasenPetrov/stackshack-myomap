@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/MyoMap.iml" filepath="$PROJECT_DIR$/MyoMap.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/stackshack-myomap.iml" filepath="$PROJECT_DIR$/stackshack-myomap.iml" />
     </modules>
   </component>
 </project>
