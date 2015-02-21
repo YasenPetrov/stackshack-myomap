@@ -92,6 +92,10 @@ public class MapsActivity extends ActionBarActivity {
                 mMap.animateCamera(CameraUpdateFactory.zoomBy(mRoll/10));
 //                mMap.animateCamera(CameraUpdateFactory.scrollBy(mYaw/10, mPitch/10));
             }
+             if(myo.getPose() == Pose.FINGERS_SPREAD) {
+                 float relYaw = 90 - mYaw;
+                 mMap.animateCamera(CameraUpdateFactory.scrollBy(0, mPitch * 100));
+             }
 //            mMap.animateCamera(CameraUpdateFactory.scrollBy(roll, pitch));
             // Next, we apply a rotation to the text view using the roll, pitch, and yaw.
             mRpyView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nyaw: " + mYaw);
@@ -123,15 +127,15 @@ public class MapsActivity extends ActionBarActivity {
                     mTextView.setText(getString(R.string.pose_fist));
                     break;
                 case WAVE_IN:
-                    mMap.animateCamera(CameraUpdateFactory.zoomOut());
+//                    mMap.animateCamera(CameraUpdateFactory.zoomOut());
                     mTextView.setText(getString(R.string.pose_wavein));
                     break;
                 case WAVE_OUT:
-                    mMap.animateCamera(CameraUpdateFactory.scrollBy(((float)60.5), (float) 45.5));
+//                    mMap.animateCamera(CameraUpdateFactory.scrollBy(((float)60.5), (float) 45.5));
                     mTextView.setText(getString(R.string.pose_waveout));
                     break;
                 case FINGERS_SPREAD:
-                    mMap.animateCamera(CameraUpdateFactory.scrollBy(((float) -60.5), (float) -45.5));
+//                    mMap.animateCamera(CameraUpdateFactory.scrollBy(((float) -60.5), (float) -45.5));
                     mTextView.setText(getString(R.string.pose_fingersspread));
                     break;
             }
