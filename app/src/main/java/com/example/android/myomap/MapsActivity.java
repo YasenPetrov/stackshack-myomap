@@ -11,9 +11,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.thalmic.myo.AbstractDeviceListener;
 import com.thalmic.myo.Arm;
 import com.thalmic.myo.DeviceListener;
@@ -26,13 +25,23 @@ import com.thalmic.myo.scanner.ScanActivity;
 
 public class MapsActivity extends ActionBarActivity {
 
+
+    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private TextView mGestureTextView;
+    private TextView mLockStateTextView;
+    private TextView mRpyTextView;
+    private float mRoll;
+    private float mPitch;
+    private float mYaw;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        mLockStateView = (TextView) findViewById(R.id.lock_textview);
-        mTextView = (TextView) findViewById(R.id.gesture_textview);
+        mLockStateTextView = (TextView) findViewById(R.id.lock_textview);
+        mGestureTextView = (TextView) findViewById(R.id.gesture_textview);
+        mRpyTextView = (TextView) findViewById(R.id.rpy_textview);
 
         // First, we initialize the Hub singleton with an application identifier.
         Hub hub = Hub.getInstance();
@@ -44,13 +53,8 @@ public class MapsActivity extends ActionBarActivity {
         }
         // Next, register for DeviceListener callbacks.
         hub.addListener(mListener);
-
-        setUpMapIfNeeded();
+        setUpMap();
     }
-
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    private TextView mTextView;
-    private TextView mLockStateView;
 
     // Classes that inherit from AbstractDeviceListener can be used to receive events from Myo devices.
     // If you do not override an event, the default behavior is to do nothing.
@@ -59,98 +63,102 @@ public class MapsActivity extends ActionBarActivity {
         @Override
         public void onConnect(Myo myo, long timestamp) {
             // Set the text color of the text view to cyan when a Myo connects.
-            mTextView.setTextColor(Color.CYAN);
+            mGestureTextView.setTextColor(Color.CYAN);
         }
         // onDisconnect() is called whenever a Myo has been disconnected.
         @Override
         public void onDisconnect(Myo myo, long timestamp) {
             // Set the text color of the text view to red when a Myo disconnects.
-            mTextView.setTextColor(Color.RED);
+            mGestureTextView.setTextColor(Color.RED);
         }
         // onArmSync() is called whenever Myo has recognized a Sync Gesture after someone has put it on their
         // arm. This lets Myo know which arm it's on and which way it's facing.
         @Override
         public void onArmSync(Myo myo, long timestamp, Arm arm, XDirection xDirection) {
-            mTextView.setText(myo.getArm() == Arm.LEFT ? R.string.arm_left : R.string.arm_right);
+            mGestureTextView.setText(myo.getArm() == Arm.LEFT ? R.string.arm_left : R.string.arm_right);
         }
         // onArmUnsync() is called whenever Myo has detected that it was moved from a stable position on a person's arm after
         // it recognized the arm. Typically this happens when someone takes Myo off of their arm, but it can also happen
         // when Myo is moved around on the arm.
         @Override
         public void onArmUnsync(Myo myo, long timestamp) {
-            mTextView.setText(R.string.hello_world);
+            mGestureTextView.setText(R.string.hello_world);
         }
         // onUnlock() is called whenever a synced Myo has been unlocked. Under the standard locking
         // policy, that means poses will now be delivered to the listener.
         @Override
         public void onUnlock(Myo myo, long timestamp) {
-            mLockStateView.setText(R.string.unlocked);
+            mLockStateTextView.setText(R.string.unlocked);
         }
         // onLock() is called whenever a synced Myo has been locked. Under the standard locking
         // policy, that means poses will no longer be delivered to the listener.
         @Override
         public void onLock(Myo myo, long timestamp) {
-            mLockStateView.setText(R.string.locked);
+            mLockStateTextView.setText(R.string.locked);
         }
         // onOrientationData() is called whenever a Myo provides its current orientation,
         // represented as a quaternion.
         @Override
         public void onOrientationData(Myo myo, long timestamp, Quaternion rotation) {
             // Calculate Euler angles (roll, pitch, and yaw) from the quaternion.
-            float roll = (float) Math.toDegrees(Quaternion.roll(rotation));
-            float pitch = (float) Math.toDegrees(Quaternion.pitch(rotation));
-            float yaw = (float) Math.toDegrees(Quaternion.yaw(rotation));
+            mRoll = (float) Math.toDegrees(Quaternion.roll(rotation));
+            mPitch = (float) Math.toDegrees(Quaternion.pitch(rotation));
+            mYaw = (float) Math.toDegrees(Quaternion.yaw(rotation));
             // Adjust roll and pitch for the orientation of the Myo on the arm.
             if (myo.getXDirection() == XDirection.TOWARD_ELBOW) {
-                roll *= -1;
-                pitch *= -1;
+                mRoll *= -1;
+                mPitch *= -1;
             }
-            //mMap.animateCamera(CameraUpdateFactory.scrollBy(roll, pitch));
-            // Next, we apply a rotation to the text view using the roll, pitch, and yaw.
 
-            //annoying rotation
-            //mTextView.setRotation(roll);
-            //mTextView.setRotationX(pitch);
-            //mTextView.setRotationY(yaw);
+            if(myo.getPose() == Pose.FIST) {
+                if (mMap != null) {
+                    mMap.animateCamera(CameraUpdateFactory.zoomBy(mRoll / 10));
+                }
+//                mMap.animateCamera(CameraUpdateFactory.scrollBy(mYaw/10, mPitch/10));
+
+                mRpyTextView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nyaw: " + mYaw);
+            }
         }
         // onPose() is called whenever a Myo provides a new pose.
         @Override
         public void onPose(Myo myo, long timestamp, Pose pose) {
             // Handle the cases of the Pose enumeration, and change the text of the text view
             // based on the pose we receive.
-            switch (pose) {
-                case UNKNOWN:
-                    mTextView.setText(getString(R.string.hello_world));
-                    break;
-                case REST:
-                case DOUBLE_TAP:
-                    int restTextId = R.string.hello_world;
-                    switch (myo.getArm()) {
-                        case LEFT:
-                            restTextId = R.string.arm_left;
-                            break;
-                        case RIGHT:
-                            restTextId = R.string.arm_right;
-                            break;
-                    }
-                    mTextView.setText(getString(restTextId));
-                    break;
-                case FIST:
-                    mMap.animateCamera(CameraUpdateFactory.zoomIn());
-                    mTextView.setText(getString(R.string.pose_fist));
-                    break;
-                case WAVE_IN:
-                    mMap.animateCamera(CameraUpdateFactory.zoomOut());
-                    mTextView.setText(getString(R.string.pose_wavein));
-                    break;
-                case WAVE_OUT:
-                    mMap.animateCamera(CameraUpdateFactory.scrollBy(((float)60.5), (float) 45.5));
-                    mTextView.setText(getString(R.string.pose_waveout));
-                    break;
-                case FINGERS_SPREAD:
-                    mMap.animateCamera(CameraUpdateFactory.scrollBy(((float) -60.5), (float) -45.5));
-                    mTextView.setText(getString(R.string.pose_fingersspread));
-                    break;
+            if (mMap != null) {
+                switch (pose) {
+                    case UNKNOWN:
+                        mGestureTextView.setText(getString(R.string.hello_world));
+                        break;
+                    case REST:
+                    case DOUBLE_TAP:
+                        int restTextId = R.string.hello_world;
+                        switch (myo.getArm()) {
+                            case LEFT:
+                                restTextId = R.string.arm_left;
+                                break;
+                            case RIGHT:
+                                restTextId = R.string.arm_right;
+                                break;
+                        }
+                        mGestureTextView.setText(getString(restTextId));
+                        break;
+                    case FIST:
+                        //mMap.animateCamera(CameraUpdateFactory.zoomBy(mRoll));
+                        mGestureTextView.setText(getString(R.string.pose_fist));
+                        break;
+                    case WAVE_IN:
+                        mMap.animateCamera(CameraUpdateFactory.zoomOut());
+                        mGestureTextView.setText(getString(R.string.pose_wavein));
+                        break;
+                    case WAVE_OUT:
+                        mMap.animateCamera(CameraUpdateFactory.scrollBy(((float) 60.5), (float) 45.5));
+                        mGestureTextView.setText(getString(R.string.pose_waveout));
+                        break;
+                    case FINGERS_SPREAD:
+                        //mMap.animateCamera(CameraUpdateFactory.scrollBy(((float) -60.5), (float) -45.5));
+                        mGestureTextView.setText(getString(R.string.pose_fingersspread));
+                        break;
+                }
             }
             if (pose != Pose.UNKNOWN && pose != Pose.REST) {
                 // Tell the Myo to stay unlocked until told otherwise. We do that here so you can
@@ -171,7 +179,7 @@ public class MapsActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        setUpMapIfNeeded();
+        setUpMap();
     }
 
     @Override
@@ -201,48 +209,27 @@ public class MapsActivity extends ActionBarActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
     private void onScanActionSelected() {
         // Launch the ScanActivity to scan for Myos to connect to.
         Intent intent = new Intent(this, ScanActivity.class);
         startActivity(intent);
     }
 
-    /**
-     * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
-     * installed) and the map has not already been instantiated.. This will ensure that we only ever
-     * call {@link #setUpMap()} once when {@link #mMap} is not null.
-     * <p/>
-     * If it isn't installed {@link SupportMapFragment} (and
-     * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
-     * install/update the Google Play services APK on their device.
-     * <p/>
-     * A user can return to this FragmentActivity after following the prompt and correctly
-     * installing/updating/enabling the Google Play services. Since the FragmentActivity may not
-     * have been completely destroyed during this process (it is likely that it would only be
-     * stopped or paused), {@link #onCreate(Bundle)} may not be called again so we should call this
-     * method in {@link #onResume()} to guarantee that it will be called.
-     */
-    private void setUpMapIfNeeded() {
+    private void setUpMap() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
-            // Check if we were successful in obtaining the map.
-            if (mMap != null) {
-                setUpMap();
-            }
+            ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+                    .getMapAsync(new OnMapReadyCallback() {
+                        @Override
+                        public void onMapReady(GoogleMap googleMap) {
+                            mMap = googleMap;
+                            mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                            //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+                        }
+                    });
         }
     }
 
-    /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
-     * <p/>
-     * This should only be called once and when we are sure that {@link #mMap} is not null.
-     */
-    private void setUpMap() {
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
-    }
 }
