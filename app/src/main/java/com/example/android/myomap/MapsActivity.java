@@ -30,6 +30,10 @@ public class MapsActivity extends ActionBarActivity {
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private TextView mTextView;
     private TextView mLockStateView;
+    private TextView mRpyView;
+    private float mRoll;
+    private float mPitch;
+    private float mYaw;
 
     // Classes that inherit from AbstractDeviceListener can be used to receive events from Myo devices.
     // If you do not override an event, the default behavior is to do nothing.
@@ -76,19 +80,21 @@ public class MapsActivity extends ActionBarActivity {
         @Override
         public void onOrientationData(Myo myo, long timestamp, Quaternion rotation) {
             // Calculate Euler angles (roll, pitch, and yaw) from the quaternion.
-            float roll = (float) Math.toDegrees(Quaternion.roll(rotation));
-            float pitch = (float) Math.toDegrees(Quaternion.pitch(rotation));
-            float yaw = (float) Math.toDegrees(Quaternion.yaw(rotation));
+            mRoll = (float) Math.toDegrees(Quaternion.roll(rotation));
+            mPitch = (float) Math.toDegrees(Quaternion.pitch(rotation));
+            mYaw = (float) Math.toDegrees(Quaternion.yaw(rotation));
             // Adjust roll and pitch for the orientation of the Myo on the arm.
             if (myo.getXDirection() == XDirection.TOWARD_ELBOW) {
-                roll *= -1;
-                pitch *= -1;
+                mRoll *= -1;
+                mPitch *= -1;
             }
-            mMap.animateCamera(CameraUpdateFactory.scrollBy(roll, pitch));
+            if(myo.getPose() == Pose.FIST) {
+                mMap.animateCamera(CameraUpdateFactory.zoomBy(mRoll/10));
+//                mMap.animateCamera(CameraUpdateFactory.scrollBy(mYaw/10, mPitch/10));
+            }
+//            mMap.animateCamera(CameraUpdateFactory.scrollBy(roll, pitch));
             // Next, we apply a rotation to the text view using the roll, pitch, and yaw.
-            mTextView.setRotation(roll);
-            mTextView.setRotationX(pitch);
-            mTextView.setRotationY(yaw);
+            mRpyView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nyaw: " + mYaw);
         }
         // onPose() is called whenever a Myo provides a new pose.
         @Override
@@ -113,7 +119,7 @@ public class MapsActivity extends ActionBarActivity {
                     mTextView.setText(getString(restTextId));
                     break;
                 case FIST:
-                    mMap.animateCamera(CameraUpdateFactory.zoomIn());
+//                    mMap.animateCamera(CameraUpdateFactory.zoomBy(mRoll));
                     mTextView.setText(getString(R.string.pose_fist));
                     break;
                 case WAVE_IN:
@@ -151,6 +157,7 @@ public class MapsActivity extends ActionBarActivity {
 
         mLockStateView = (TextView) findViewById(R.id.lock_state);
         mTextView = (TextView) findViewById(R.id.text);
+        mRpyView = (TextView) findViewById(R.id.rpy_view);
 
         // First, we initialize the Hub singleton with an application identifier.
         Hub hub = Hub.getInstance();
