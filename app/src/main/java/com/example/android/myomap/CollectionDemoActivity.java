@@ -189,6 +189,7 @@ public class CollectionDemoActivity extends FragmentActivity {
         // onDisconnect() is called whenever a Myo has been disconnected.
         @Override
         public void onDisconnect(Myo myo, long timestamp) {
+            scanButton.setVisibility(View.VISIBLE);
             // Set the text color of the text view to red when a Myo disconnects.
             //mGestureTextView.setTextColor(Color.RED);
         }
