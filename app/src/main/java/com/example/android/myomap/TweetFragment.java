@@ -104,7 +104,7 @@ public class TweetFragment extends Fragment {
         if(cursorButton. getTop() <= likeButton.getBottom()) {
             sendTweet("You're epic!");
         }
-        if(cursorButton. getBottom() <= hateButton.getTop()) {
+        if(cursorButton. getBottom() >= hateButton.getTop()) {
             sendTweet("You guys suck!");
         }
     }
