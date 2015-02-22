@@ -272,6 +272,7 @@ public class CollectionDemoActivity extends FragmentActivity {
 //                    (mYaw - mYawOnSpread));
 
             if(myo.getPose() == Pose.FIST) {
+                Log.v(LOG_TAG, "FIST!");
                 if (mMap != null) {
                     float zoomRoll = (mRoll - ROLL_CORRECTION) / 10;
                     mMap.animateCamera(CameraUpdateFactory.zoomBy(zoomRoll));

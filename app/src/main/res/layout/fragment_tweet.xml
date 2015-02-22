@@ -5,16 +5,16 @@
 
     <!-- TODO: Update blank fragment layout -->
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Button"
-        android:id="@+id/tweet_button"
-        android:layout_gravity="center_horizontal|center_vertical"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="false"
-        android:layout_alignWithParentIfMissing="true" />
+    <!--<Button-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="New Button"-->
+        <!--android:id="@+id/tweet_button"-->
+        <!--android:layout_gravity="center_horizontal|center_vertical"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:layout_alignParentBottom="false"-->
+        <!--android:layout_alignWithParentIfMissing="true" />-->
 
     <Button
         android:layout_width="wrap_content"
@@ -36,5 +36,13 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentTop="false"
         android:layout_alignParentLeft="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true" />
+        <!--android:src="@drawable"/>-->
 
 </RelativeLayout>
