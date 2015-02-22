@@ -41,7 +41,7 @@ public class MapsActivity extends ActionBarActivity {
     private String pitchText;
     // when zooming, substract this constant from the roll for
     // more natural arm position when zooming
-    private final float ROLL_CORRECTION = 35;
+    private final float ROLL_CORRECTION = 20;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,23 +76,26 @@ public class MapsActivity extends ActionBarActivity {
             // Set the text color of the text view to cyan when a Myo connects.
             mGestureTextView.setTextColor(Color.CYAN);
         }
+
         // onDisconnect() is called whenever a Myo has been disconnected.
         @Override
         public void onDisconnect(Myo myo, long timestamp) {
             // Set the text color of the text view to red when a Myo disconnects.
             mGestureTextView.setTextColor(Color.RED);
         }
+
         // onArmSync() is called whenever Myo has recognized a Sync Gesture after someone has put it on their
         // arm. This lets Myo know which arm it's on and which way it's facing.
         @Override
         public void onArmSync(Myo myo, long timestamp, Arm arm, XDirection xDirection) {
             mArm = myo.getArm();
-            if (mArm == Arm.LEFT){
+            if (mArm == Arm.LEFT) {
                 mGestureTextView.setText(R.string.arm_left);
             } else {
                 mGestureTextView.setText(R.string.arm_right);
             }
         }
+
         // onArmUnsync() is called whenever Myo has detected that it was moved from a stable position on a person's arm after
         // it recognized the arm. Typically this happens when someone takes Myo off of their arm, but it can also happen
         // when Myo is moved around on the arm.
@@ -101,18 +104,21 @@ public class MapsActivity extends ActionBarActivity {
             mArm = Arm.UNKNOWN;
             mGestureTextView.setText(R.string.hello_world);
         }
+
         // onUnlock() is called whenever a synced Myo has been unlocked. Under the standard locking
         // policy, that means poses will now be delivered to the listener.
         @Override
         public void onUnlock(Myo myo, long timestamp) {
             mLockStateTextView.setText(R.string.unlocked);
         }
+
         // onLock() is called whenever a synced Myo has been locked. Under the standard locking
         // policy, that means poses will no longer be delivered to the listener.
         @Override
         public void onLock(Myo myo, long timestamp) {
             mLockStateTextView.setText(R.string.locked);
         }
+
         // onOrientationData() is called whenever a Myo provides its current orientation,
         // represented as a quaternion.
         @Override
@@ -121,7 +127,7 @@ public class MapsActivity extends ActionBarActivity {
             mRoll = (float) Math.toDegrees(Quaternion.roll(rotation));
             mPitch = (float) Math.toDegrees(Quaternion.pitch(rotation));
             mYaw = (float) Math.toDegrees(Quaternion.yaw(rotation));
-            if (mUpdateYawOnSpread){
+            if (mUpdateYawOnSpread) {
                 mUpdateYawOnSpread = false;
                 mYawOnSpread = mYaw;
             }
@@ -131,38 +137,37 @@ public class MapsActivity extends ActionBarActivity {
                 mPitch *= -1;
             }
 
-
-
-            if(myo.getPose() == Pose.FIST) {
+            if (myo.getPose() == Pose.FIST) {
                 if (mMap != null) {
-                    float zoomRoll = (mRoll - 30) / 10;
+                    float zoomRoll = (mRoll - ROLL_CORRECTION) / 10; //i changed to 20 i have to try way too hard w 30
                     mMap.animateCamera(CameraUpdateFactory.zoomBy(zoomRoll));
                 }
-//                mMap.animateCamera(CameraUpdateFactory.scrollBy(mYaw/10, mPitch/10));
-
             }
 
-             if(myo.getPose() == Pose.FINGERS_SPREAD) {
-                 float maxPitch = 2250;
-                 float relYaw = mYaw - mYawOnSpread;
-                 float scrollYaw =  -relYaw * 150;
-                 yawText = String.valueOf(scrollYaw);
+            if (myo.getPose() == Pose.FINGERS_SPREAD) {
+                float maxPitch = 2250;
+                float relYaw = mYaw - mYawOnSpread;
+                float scrollYaw = -relYaw * 150;
+                yawText = String.valueOf(scrollYaw);
 
-                 float scrollPitch = mPitch * 150 ;
-                 if (Math.abs(scrollPitch) > maxPitch){
-                     scrollPitch = maxPitch * Math.signum(scrollPitch); //testing
-                 }
-                 pitchText = String.valueOf(scrollPitch); //temp
-                // Creates a CameraPosition from the builder
-                 mMap.animateCamera(CameraUpdateFactory.scrollBy(scrollYaw, scrollPitch));
-                 //mMap.animateCamera
-             }
+                float scrollPitch = mPitch * 150;
+                if (Math.abs(scrollPitch) > maxPitch) {
+                    scrollPitch = maxPitch * Math.signum(scrollPitch); //testing
+
+
+                    pitchText = String.valueOf(scrollPitch); //temp
+                    // Creates a CameraPosition from the builder
+                    mMap.animateCamera(CameraUpdateFactory.scrollBy(scrollYaw, scrollPitch));
+                    //mMap.animateCamera
+                }
 //            mMap.animateCamera(CameraUpdateFactory.scrollBy(roll, pitch));
-            // Next, we apply a rotation to the text view using the roll, pitch, and yaw.
-            //mRpyTextView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nyaw: " + mYaw);
-            mRpyTextView.setText("roll: " + mRoll + "\npitch: " + pitchText + "\nrelYaw: " +
-                    yawText);
+                // Next, we apply a rotation to the text view using the roll, pitch, and yaw.
+                //mRpyTextView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nyaw: " + mYaw);
+                mRpyTextView.setText("roll: " + mRoll + "\npitch: " + pitchText + "\nrelYaw: " +
+                        yawText);
+            }
         }
+
         // onPose() is called whenever a Myo provides a new pose.
         @Override
         public void onPose(Myo myo, long timestamp, Pose pose) {
@@ -220,7 +225,7 @@ public class MapsActivity extends ActionBarActivity {
         }
     };
 
-    private void getCurrentYaw(){
+    private void getCurrentYaw() {
     }
 
     @Override
@@ -279,13 +284,13 @@ public class MapsActivity extends ActionBarActivity {
                             mMap = googleMap;
                             mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                             mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-                                @Override
-                                public void onCameraChange(CameraPosition cameraPosition) {
-                                        float minZoom = 1.5f;
-                                        if (cameraPosition.zoom < minZoom)
-                                            mMap.animateCamera(CameraUpdateFactory.zoomTo(minZoom));
-                                    }
-                                }
+                                                               @Override
+                                                               public void onCameraChange(CameraPosition cameraPosition) {
+                                                                   float minZoom = 1.5f;
+                                                                   if (cameraPosition.zoom < minZoom)
+                                                                       mMap.animateCamera(CameraUpdateFactory.zoomTo(minZoom));
+                                                               }
+                                                           }
                             );
                         }
 
@@ -293,5 +298,4 @@ public class MapsActivity extends ActionBarActivity {
         }
 
     }
-
-}
+};
