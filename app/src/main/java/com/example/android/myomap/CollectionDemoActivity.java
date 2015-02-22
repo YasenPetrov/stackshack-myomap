@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -34,9 +35,6 @@ import com.thalmic.myo.scanner.ScanActivity;
 public class CollectionDemoActivity extends FragmentActivity {
 
 
-    private static final String LOG_TAG = "MapActivity says: ";
-    
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private TextView mGestureTextView;
     private TextView mLockStateTextView;
     private TextView mRpyTextView;
@@ -97,7 +95,7 @@ public class CollectionDemoActivity extends FragmentActivity {
         mDemoCollectionPagerAdapter = new DemoCollectionPagerAdapter(getSupportFragmentManager());
 
         // Set up action bar.
-        final ActionBar actionBar = getActionBar();
+//        final ActionBar actionBar = getActionBar();
 
         // Specify that the Home button should show an "Up" caret, indicating that touching the
         // button will take the user one step up in the application's hierarchy.
@@ -225,43 +223,52 @@ public class CollectionDemoActivity extends FragmentActivity {
         // represented as a quaternion.
         @Override
         public void onOrientationData(Myo myo, long timestamp, Quaternion rotation) {
+
             // Calculate Euler angles (roll, pitch, and yaw) from the quaternion.
             mRoll = (float) Math.toDegrees(Quaternion.roll(rotation));
             mPitch = (float) Math.toDegrees(Quaternion.pitch(rotation));
             mYaw = (float) Math.toDegrees(Quaternion.yaw(rotation));
-//            if (mUpdateYawOnSpread){
-//                mUpdateYawOnSpread = false;
-//                mYawOnSpread = mYaw;
-//            }
-//            // Adjust roll and pitch for the orientation of the Myo on the arm.
-//            if (myo.getXDirection() == XDirection.TOWARD_ELBOW) {
-//                mRoll *= -1;
-//                mPitch *= -1;
-//            }
-//
+            if (mUpdateYawOnSpread){
+                mUpdateYawOnSpread = false;
+                mYawOnSpread = mYaw;
+            }
+            // Adjust roll and pitch for the orientation of the Myo on the arm.
+            if (myo.getXDirection() == XDirection.TOWARD_ELBOW) {
+                mRoll *= -1;
+                mPitch *= -1;
+            }
+
 //            mRpyTextView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nrelYaw: " +
 //                    (mYaw - mYawOnSpread));
-//
-//            if(myo.getPose() == Pose.FIST) {
-//                if (mMap != null) {
-//                    float zoomRoll = (mRoll - 30) / 10;
-//                    mMap.animateCamera(CameraUpdateFactory.zoomBy(zoomRoll));
-//                }
-////                mMap.animateCamera(CameraUpdateFactory.scrollBy(mYaw/10, mPitch/10));
-//
-//            }
-//
-//            if(myo.getPose() == Pose.FINGERS_SPREAD) {
-//                float relYaw = mYaw - mYawOnSpread;
-//                float scrollYaw =  -relYaw * 150;
-//                float scrollPitch = mPitch * 150 ;
-//                // Creates a CameraPosition from the builder
-//                mMap.animateCamera(CameraUpdateFactory.scrollBy(scrollYaw, scrollPitch));
-//
-//                //mMap.animateCamera
-//            }
-////            mMap.animateCamera(CameraUpdateFactory.scrollBy(roll, pitch));
-//            // Next, we apply a rotation to the text view using the roll, pitch, and yaw.
+
+            if(myo.getPose() == Pose.FIST) {
+                if (mMap != null) {
+                    float zoomRoll = (mRoll - ROLL_CORRECTION) / 10;
+                    mMap.animateCamera(CameraUpdateFactory.zoomBy(zoomRoll));
+                }
+//                mMap.animateCamera(CameraUpdateFactory.scrollBy(mYaw/10, mPitch/10));
+
+            }
+
+            if(myo.getPose() == Pose.FINGERS_SPREAD) {
+                float relYaw = mYaw - mYawOnSpread;
+                float scrollYaw =  -relYaw * 150;
+                float scrollPitch = mPitch * 150 ;
+                float maxScrollPitch = 2200;
+                float maxScrollYaw = 2200;
+                if(Math.abs(scrollPitch) > maxScrollPitch) {
+                    scrollPitch = maxScrollPitch * Math.signum(scrollPitch);
+                }
+                if(Math.abs(scrollYaw) > maxScrollYaw) {
+                    scrollYaw = maxScrollYaw * Math.signum(scrollYaw);
+                }
+                // Creates a CameraPosition from the builder
+                mMap.animateCamera(CameraUpdateFactory.scrollBy(scrollYaw, scrollPitch));
+
+                //mMap.animateCamera
+            }
+//            mMap.animateCamera(CameraUpdateFactory.scrollBy(roll, pitch));
+            // Next, we apply a rotation to the text view using the roll, pitch, and yaw.
 //            mRpyTextView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nyaw: " + mYaw);
         }
 
@@ -270,7 +277,9 @@ public class CollectionDemoActivity extends FragmentActivity {
         public void onPose(Myo myo, long timestamp, Pose pose) {
             // Handle the cases of the Pose enumeration, and change the text of the text view
             // based on the pose we receive.
-//            if (mMap != null) {
+            if (mMap != null) {
+                mMap.stopAnimation();
+            }
             switch (pose) {
                 case UNKNOWN:
                     //mGestureTextView.setText(getString(R.string.hello_world));
@@ -289,20 +298,24 @@ public class CollectionDemoActivity extends FragmentActivity {
                     //mGestureTextView.setText(getString(restTextId));
                     break;
                 case FIST:
+                    Log.v(LOG_TAG, "Fist");
                     //mMap.animateCamera(CameraUpdateFactory.zoomBy(mRoll));
                     //mGestureTextView.setText(getString(R.string.pose_fist));
                     break;
                 case WAVE_IN:
+                    Log.v(LOG_TAG, "Wave IN");
                     //mMap.animateCamera(CameraUpdateFactory.zoomOut());
                     //mGestureTextView.setText(getString(R.string.pose_wavein));
                     mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1, true);
                     break;
                 case WAVE_OUT:
+                    Log.v(LOG_TAG, "Wave OUT");
                     //mMap.animateCamera(CameraUpdateFactory.scrollBy(((float) 60.5), (float) 45.5));
                     //mGestureTextView.setText(getString(R.string.pose_waveout));
                     mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1, true);
                     break;
                 case FINGERS_SPREAD:
+                    Log.v(LOG_TAG, "Fingers Spread");
                     //mMap.animateCamera(CameraUpdateFactory.scrollBy(((float) -60.5), (float) -45.5));
                     //mGestureTextView.setText(getString(R.string.pose_fingersspread));
 //                        mUpdateYawOnSpread = true;
