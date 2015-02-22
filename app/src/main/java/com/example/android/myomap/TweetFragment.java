@@ -82,6 +82,11 @@ public class TweetFragment extends Fragment {
         likeButton = (Button) rootView.findViewById(R.id.like_button);
         hateButton = (Button) rootView.findViewById(R.id.hate_button);
         twitterPic = (ImageView) rootView.findViewById(R.id.twitter_picture);
+        twitterPic.setTop(200);
+        twitterPic.setBottom(400);
+        Log.v(LOG_TAG, "TOP: "+ twitterPic.getTop() + "bottom: " + twitterPic.getBottom());
+        Log.v(LOG_TAG, "likeTOP: "+ likeButton.getTop() + "likebottom: " + likeButton.getBottom());
+        Log.v(LOG_TAG, "hateTOP: "+ hateButton.getTop() + "hatebottom: " + hateButton.getBottom());
 
         return rootView;
     }
@@ -89,6 +94,8 @@ public class TweetFragment extends Fragment {
     public void moveTwitterPicture(int value) {
         twitterPic.setBottom(twitterPic.getBottom() + value);
         twitterPic.setTop(twitterPic.getTop() + value);
+        int a = twitterPic.getTop();
+        Log.v(LOG_TAG, "TOP: "+ twitterPic.getTop() + "bottom: " + twitterPic.getBottom());
         if(twitterPic. getTop() <= likeButton.getBottom()) {
             sendTweet("You're epic!");
         }

@@ -265,7 +265,7 @@ public class CollectionDemoActivity extends FragmentActivity {
 
             // Move cursor in tweet fragment
             if(mViewPager.getCurrentItem() == 1 && myo.getPose() == Pose.FIST) {
-                ((TextView) findViewById(R.id.twitter_textview)).setText("");
+//                ((TextView) findViewById(R.id.twitter_textview)).setText("");
                 mTweetFragment.moveTwitterPicture((int) mPitch);
             }
 

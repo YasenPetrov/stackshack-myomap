@@ -49,18 +49,18 @@
         android:id="@+id/twitter_picture"
         android:src="@drawable/twitter_bird"
         android:scaleType="fitXY"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_centerInParent="true" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/twitter_text"
-        android:id="@+id/twitter_textview"
-        android:layout_alignStart="@+id/twitter_picture"
-        android:layout_alignBottom="@+id/twitter_picture"
-        android:layout_alignEnd="@+id/twitter_picture"
-        android:textAlignment="center"
-        android:gravity="center" />
+    <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/twitter_text"-->
+        <!--android:id="@+id/twitter_textview"-->
+        <!--android:layout_alignStart="@+id/twitter_picture"-->
+        <!--android:layout_alignBottom="@+id/twitter_picture"-->
+        <!--android:layout_alignEnd="@+id/twitter_picture"-->
+        <!--android:textAlignment="center"-->
+        <!--android:gravity="center" />-->
 
 </RelativeLayout>
