@@ -266,12 +266,12 @@ public class CollectionDemoActivity extends FragmentActivity {
                 if(mMap != null) {
                     mMap.stopAnimation();
                 }
-                float maxPitch = 2800;
-                float maxYaw = 2800;
+                float maxPitch = 4200;
+                float maxYaw = 4200;
                 float relYaw = mYaw - mYawOnSpread;
-                float scrollYaw = -relYaw * 140;
-//                yawText = String.valueOf(scrollYaw);
-                float scrollPitch = mPitch * 110;
+                float scrollYaw = -relYaw * 170;
+//                yawText = String.valueOf(scrollYaw)
+                float scrollPitch = mPitch * 170;
                 Log.v(LOG_TAG, ("mYaw :" + mYaw + "\nmYawOnSpread: " + mYawOnSpread + "\n scrollYaw: " + scrollYaw));
                 if (Math.abs(scrollPitch) > maxPitch) {
                     Log.v(LOG_TAG, "Pitch ping: " + scrollPitch);
