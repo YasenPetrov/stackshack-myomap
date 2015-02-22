@@ -14,7 +14,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.thalmic.myo.AbstractDeviceListener;
 import com.thalmic.myo.Arm;
 import com.thalmic.myo.DeviceListener;
@@ -140,6 +139,7 @@ public class MapsActivity extends ActionBarActivity {
             if (myo.getPose() == Pose.FIST) {
                 if (mMap != null) {
                     float zoomRoll = (mRoll - ROLL_CORRECTION) / 10; //i changed to 20 i have to try way too hard w 30
+                    mMap.stopAnimation();
                     mMap.animateCamera(CameraUpdateFactory.zoomBy(zoomRoll));
                 }
             }
@@ -152,17 +152,11 @@ public class MapsActivity extends ActionBarActivity {
 
                 float scrollPitch = mPitch * 150;
                 if (Math.abs(scrollPitch) > maxPitch) {
-                    scrollPitch = maxPitch * Math.signum(scrollPitch); //testing
-
-
-                    pitchText = String.valueOf(scrollPitch); //temp
-                    // Creates a CameraPosition from the builder
-                    mMap.animateCamera(CameraUpdateFactory.scrollBy(scrollYaw, scrollPitch));
-                    //mMap.animateCamera
+                    scrollPitch = maxPitch * Math.signum(scrollPitch);
                 }
-//            mMap.animateCamera(CameraUpdateFactory.scrollBy(roll, pitch));
-                // Next, we apply a rotation to the text view using the roll, pitch, and yaw.
-                //mRpyTextView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nyaw: " + mYaw);
+                mMap.stopAnimation();
+                mMap.animateCamera(CameraUpdateFactory.scrollBy(scrollYaw, scrollPitch));
+                pitchText = String.valueOf(scrollPitch);
                 mRpyTextView.setText("roll: " + mRoll + "\npitch: " + pitchText + "\nrelYaw: " +
                         yawText);
             }
@@ -178,7 +172,9 @@ public class MapsActivity extends ActionBarActivity {
                     case UNKNOWN:
                         mGestureTextView.setText(getString(R.string.hello_world));
                         break;
+
                     case REST:
+
                     case DOUBLE_TAP:
                         int restTextId = R.string.hello_world;
                         switch (myo.getArm()) {
@@ -191,20 +187,20 @@ public class MapsActivity extends ActionBarActivity {
                         }
                         mGestureTextView.setText(getString(restTextId));
                         break;
+
                     case FIST:
-                        //mMap.animateCamera(CameraUpdateFactory.zoomBy(mRoll));
                         mGestureTextView.setText(getString(R.string.pose_fist));
                         break;
+
                     case WAVE_IN:
-                        //mMap.animateCamera(CameraUpdateFactory.zoomOut());
                         mGestureTextView.setText(getString(R.string.pose_wavein));
                         break;
+
                     case WAVE_OUT:
-                        //mMap.animateCamera(CameraUpdateFactory.scrollBy(((float) 60.5), (float) 45.5));
                         mGestureTextView.setText(getString(R.string.pose_waveout));
                         break;
+
                     case FINGERS_SPREAD:
-                        //mMap.animateCamera(CameraUpdateFactory.scrollBy(((float) -60.5), (float) -45.5));
                         mGestureTextView.setText(getString(R.string.pose_fingersspread));
                         mUpdateYawOnSpread = true;
                         break;
@@ -224,9 +220,6 @@ public class MapsActivity extends ActionBarActivity {
             }
         }
     };
-
-    private void getCurrentYaw() {
-    }
 
     @Override
     protected void onResume() {
@@ -283,15 +276,6 @@ public class MapsActivity extends ActionBarActivity {
                         public void onMapReady(GoogleMap googleMap) {
                             mMap = googleMap;
                             mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                            mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-                                                               @Override
-                                                               public void onCameraChange(CameraPosition cameraPosition) {
-                                                                   float minZoom = 1.5f;
-                                                                   if (cameraPosition.zoom < minZoom)
-                                                                       mMap.animateCamera(CameraUpdateFactory.zoomTo(minZoom));
-                                                               }
-                                                           }
-                            );
                         }
 
                     });
