@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +23,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.thalmic.myo.AbstractDeviceListener;
 import com.thalmic.myo.Arm;
 import com.thalmic.myo.DeviceListener;
@@ -50,13 +54,13 @@ public class CollectionDemoActivity extends FragmentActivity {
     private float mRoll;
     private float mPitch;
     private float mYaw;
-    private boolean mUpdateYawOnSpread = false;
     private float mYawOnSpread = 0;
+    private boolean mUpdateYawOnSpread = false;
     private String yawText; //temp
     private String pitchText;
     // when zooming, substract this constant from the roll for
     // more natural arm position when zooming
-    private final float ROLL_CORRECTION = 28;
+    private final float ROLL_CORRECTION = 36;
     private static SupportMapFragment mapFragment;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide fragments representing
@@ -251,18 +255,24 @@ public class CollectionDemoActivity extends FragmentActivity {
             }
 
             if(myo.getPose() == Pose.FINGERS_SPREAD) {
+                if(mMap != null) {
+                    mMap.stopAnimation();
+                }
+                float maxPitch = 2800;
+                float maxYaw = 2800;
                 float relYaw = mYaw - mYawOnSpread;
-                float scrollYaw =  -relYaw * 150;
-                float scrollPitch = mPitch * 150 ;
-                float maxScrollPitch = 2200;
-                float maxScrollYaw = 2200;
-                if(Math.abs(scrollPitch) > maxScrollPitch) {
-                    scrollPitch = maxScrollPitch * Math.signum(scrollPitch);
+                float scrollYaw = -relYaw * 140;
+//                yawText = String.valueOf(scrollYaw);
+                float scrollPitch = mPitch * 110;
+                Log.v(LOG_TAG, ("mYaw :" + mYaw + "\nmYawOnSpread: " + mYawOnSpread + "\n scrollYaw: " + scrollYaw));
+                if (Math.abs(scrollPitch) > maxPitch) {
+                    Log.v(LOG_TAG, "Pitch ping: " + scrollPitch);
+                    scrollPitch = maxPitch * Math.signum(scrollPitch);
                 }
-                if(Math.abs(scrollYaw) > maxScrollYaw) {
-                    scrollYaw = maxScrollYaw * Math.signum(scrollYaw);
+                if (Math.abs(scrollYaw) > maxYaw) {
+                    Log.v(LOG_TAG, "Yaw ping: " + scrollYaw);
+                    scrollYaw = maxYaw * Math.signum(scrollYaw);
                 }
-                // Creates a CameraPosition from the builder
                 mMap.animateCamera(CameraUpdateFactory.scrollBy(scrollYaw, scrollPitch));
 
                 //mMap.animateCamera
@@ -316,6 +326,7 @@ public class CollectionDemoActivity extends FragmentActivity {
                     break;
                 case FINGERS_SPREAD:
                     Log.v(LOG_TAG, "Fingers Spread");
+                    mUpdateYawOnSpread = true;
                     //mMap.animateCamera(CameraUpdateFactory.scrollBy(((float) -60.5), (float) -45.5));
                     //mGestureTextView.setText(getString(R.string.pose_fingersspread));
 //                        mUpdateYawOnSpread = true;
@@ -358,20 +369,42 @@ public class CollectionDemoActivity extends FragmentActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setHasOptionsMenu(true);
+            final CameraPosition cameraPosition;
             FragmentManager fm = getChildFragmentManager();
             mapFragment = (SupportMapFragment) fm.findFragmentById(R.id.map);
             if (mapFragment == null) {
                 mapFragment = SupportMapFragment.newInstance();
                 fm.beginTransaction().replace(R.id.map, mapFragment).commit();
+                if(savedInstanceState != null && savedInstanceState.containsKey("cameraPosition")) {
+                    cameraPosition = savedInstanceState.getParcelable("cameraPostion");
+                } else cameraPosition = null;
                 mapFragment.getMapAsync(new OnMapReadyCallback() {
                     @Override
                     public void onMapReady(GoogleMap map) {
+                        LatLng staLatLng = new LatLng(56.340107, -2.808320);
+                        LatLng ediLatLng = new LatLng(55.944184, -3.186597);
+                        LatLng glaLatLng = new LatLng(55.871706, -4.287941);
                         mMap = map;
+                        if(cameraPosition != null) {
+                            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                        } else {
+                            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(
+                                    staLatLng, (float) 14.5, 0, 0)));
+                        }
+                        mMap.addMarker(new MarkerOptions().position(staLatLng));
+                        mMap.addMarker(new MarkerOptions().position(ediLatLng));
+                        mMap.addMarker(new MarkerOptions().position(glaLatLng));
                     }
                 });
             }
+            getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         }
 
+        @Override
+        public void onSaveInstanceState(Bundle savedInstanceState) {
+            super.onSaveInstanceState(savedInstanceState);
+            savedInstanceState.putParcelable("cameraPosition", mMap.getCameraPosition());
+        }
 
         //temp delete after, not sure how to add menu at the moment
         private void onScanActionSelected() {
