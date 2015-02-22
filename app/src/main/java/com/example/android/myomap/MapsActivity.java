@@ -34,8 +34,11 @@ public class MapsActivity extends ActionBarActivity {
     private float mRoll;
     private float mPitch;
     private float mYaw;
-    private boolean mUpdateCenterYaw = false;
-    private float mCenterYaw;
+    private boolean mUpdateYawOnSpread = false;
+    private float mYawOnSpread = 0;
+    // when zooming, substract this constant from the roll for
+    // more natural arm position when zooming
+    private final float ROLL_CORRECTION = 35;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,9 +118,9 @@ public class MapsActivity extends ActionBarActivity {
             mRoll = (float) Math.toDegrees(Quaternion.roll(rotation));
             mPitch = (float) Math.toDegrees(Quaternion.pitch(rotation));
             mYaw = (float) Math.toDegrees(Quaternion.yaw(rotation));
-            if (mUpdateCenterYaw){
-                mUpdateCenterYaw = false;
-                mCenterYaw = mYaw;
+            if (mUpdateYawOnSpread){
+                mUpdateYawOnSpread = false;
+                mYawOnSpread = mYaw;
             }
             // Adjust roll and pitch for the orientation of the Myo on the arm.
             if (myo.getXDirection() == XDirection.TOWARD_ELBOW) {
@@ -125,20 +128,25 @@ public class MapsActivity extends ActionBarActivity {
                 mPitch *= -1;
             }
 
+            mRpyTextView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nrelYaw: " +
+                    (mYaw - mYawOnSpread));
+
             if(myo.getPose() == Pose.FIST) {
                 if (mMap != null) {
-                    mMap.animateCamera(CameraUpdateFactory.zoomBy(mRoll / 10));
+                    float zoomRoll = (mRoll - 30) / 10;
+                    mMap.animateCamera(CameraUpdateFactory.zoomBy(zoomRoll));
                 }
 //                mMap.animateCamera(CameraUpdateFactory.scrollBy(mYaw/10, mPitch/10));
 
-                mRpyTextView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nyaw: " + mYaw);
             }
 
              if(myo.getPose() == Pose.FINGERS_SPREAD) {
-                 float relYaw = mYaw - mCenterYaw;
+                 float relYaw = mYaw - mYawOnSpread;
+                 float scrollYaw =  -relYaw * 150;
+                 float scrollPitch = mPitch * 150 ;
                 //TODO FIX PLS YASEN
                 // Creates a CameraPosition from the builder
-                 mMap.animateCamera(CameraUpdateFactory.scrollBy(relYaw / 10, mPitch * 100));
+                 mMap.animateCamera(CameraUpdateFactory.scrollBy(scrollYaw, scrollPitch));
 
                  //mMap.animateCamera
              }
@@ -184,7 +192,7 @@ public class MapsActivity extends ActionBarActivity {
                     case FINGERS_SPREAD:
                         //mMap.animateCamera(CameraUpdateFactory.scrollBy(((float) -60.5), (float) -45.5));
                         mGestureTextView.setText(getString(R.string.pose_fingersspread));
-                        mUpdateCenterYaw = true;
+                        mUpdateYawOnSpread = true;
                         break;
                 }
             }
