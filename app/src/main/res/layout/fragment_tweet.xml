@@ -19,31 +19,48 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Button"
+        android:text="@string/love_button_text"
         android:id="@+id/like_button"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentLeft="false"
-        android:layout_alignParentBottom="false" />
+        android:layout_alignParentBottom="false"
+        android:background="@android:color/holo_green_light"
+        android:textSize="@dimen/abc_text_size_display_1_material"
+        android:textColor="#ffc1ffb8" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Button"
+        android:text="@string/hate_button_text"
         android:id="@+id/hate_button"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_alignParentTop="false"
-        android:layout_alignParentLeft="true" />
+        android:layout_alignParentLeft="true"
+        android:background="@android:color/holo_red_light"
+        android:textSize="@dimen/abc_text_size_display_1_material"
+        android:textColor="#ffffd8c7" />
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:id="@+id/twitter_picture"
         android:src="@drawable/twitter_bird"
         android:scaleType="fitXY"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/twitter_text"
+        android:id="@+id/twitter_textview"
+        android:layout_alignStart="@+id/twitter_picture"
+        android:layout_alignBottom="@+id/twitter_picture"
+        android:layout_alignEnd="@+id/twitter_picture"
+        android:textAlignment="center"
+        android:gravity="center" />
 
 </RelativeLayout>

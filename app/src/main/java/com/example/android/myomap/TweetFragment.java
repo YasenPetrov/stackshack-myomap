@@ -9,10 +9,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.Transformation;
 import android.widget.Button;
-import android.widget.Toast;
+import android.widget.ImageView;
 
 import java.util.List;
 
@@ -40,6 +38,7 @@ public class TweetFragment extends Fragment {
     private Button cursorButton;
     private Button likeButton;
     private Button hateButton;
+    private ImageView twitterPic;
 
     private OnFragmentInteractionListener mListener;
 
@@ -79,32 +78,21 @@ public class TweetFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         final View rootView = inflater.inflate(R.layout.fragment_tweet, container, false);
-        cursorButton = (Button) rootView.findViewById(R.id.tweet_button);
+
         likeButton = (Button) rootView.findViewById(R.id.like_button);
         hateButton = (Button) rootView.findViewById(R.id.hate_button);
-        cursorButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.v("aFa: ", "" + v.getBottom());
-                v.setBottom(v.getBottom() + 100);
-                v.setTop(v.getTop() + 100);
-                Log.v("aFa: ", "vBottom" + v.getBottom() + " hateTop: " + rootView.findViewById(R.id.hate_button).getTop());
+        twitterPic = (ImageView) rootView.findViewById(R.id.twitter_picture);
 
-                if (v.getBottom() >= rootView.findViewById(R.id.hate_button).getTop()) {
-                    Toast.makeText(getActivity(), "Profit!", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
         return rootView;
     }
 
-    public void moveCursorButton(int value) {
-        cursorButton.setBottom(cursorButton.getBottom() + value);
-        cursorButton.setTop(cursorButton.getTop() + value);
-        if(cursorButton. getTop() <= likeButton.getBottom()) {
+    public void moveTwitterPicture(int value) {
+        twitterPic.setBottom(twitterPic.getBottom() + value);
+        twitterPic.setTop(twitterPic.getTop() + value);
+        if(twitterPic. getTop() <= likeButton.getBottom()) {
             sendTweet("You're epic!");
         }
-        if(cursorButton. getBottom() >= hateButton.getTop()) {
+        if(twitterPic. getBottom() >= hateButton.getTop()) {
             sendTweet("You guys suck!");
         }
     }
@@ -167,27 +155,4 @@ public class TweetFragment extends Fragment {
         public void onFragmentInteraction(Uri uri);
     }
 
-
-    public class HeightAnimation extends Animation {
-        protected final int originalHeight;
-        protected final View view;
-        protected float perValue;
-
-        public HeightAnimation(View view, int fromHeight, int toHeight) {
-            this.view = view;
-            this.originalHeight = fromHeight;
-            this.perValue = (toHeight - fromHeight);
-        }
-
-        @Override
-        protected void applyTransformation(float interpolatedTime, Transformation t) {
-            view.getLayoutParams().height = (int) (originalHeight + perValue * interpolatedTime);
-            view.requestLayout();
-        }
-
-        @Override
-        public boolean willChangeBounds() {
-            return true;
-        }
-    }
 }

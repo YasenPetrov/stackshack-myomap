@@ -15,5 +15,8 @@
     <string name="pose_fingersspread">Fingers spread</string>
     <string name="action_scan_myo">SCAN FOR MYO</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hate_button_text">HATE!</string>
+    <string name="love_button_text">LOVE THE APP!</string>
+    <string name="twitter_text">Grab Tweety by the neck!</string>
 
 </resources>

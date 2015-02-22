@@ -265,7 +265,8 @@ public class CollectionDemoActivity extends FragmentActivity {
 
             // Move cursor in tweet fragment
             if(mViewPager.getCurrentItem() == 1 && myo.getPose() == Pose.FIST) {
-                mTweetFragment.moveCursorButton((int) mPitch);
+                ((TextView) findViewById(R.id.twitter_textview)).setText("");
+                mTweetFragment.moveTwitterPicture((int) mPitch);
             }
 
 //            mRpyTextView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nrelYaw: " +
