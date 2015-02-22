@@ -2,25 +2,24 @@ package com.example.android.myomap;
 
 import android.app.ActionBar;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.NavUtils;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.thalmic.myo.AbstractDeviceListener;
 import com.thalmic.myo.Arm;
 import com.thalmic.myo.DeviceListener;
@@ -34,12 +33,12 @@ import com.thalmic.myo.scanner.ScanActivity;
 public class CollectionDemoActivity extends FragmentActivity {
 
 
-    private static final String LOG_TAG = "MapActivity says: ";
+    private static final String LOG_TAG = CollectionDemoActivity.class.getSimpleName();
 
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    private TextView mGestureTextView;
-    private TextView mLockStateTextView;
-    private TextView mRpyTextView;
+    private static GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    //private TextView mGestureTextView;
+    //private TextView mLockStateTextView;
+    //private TextView mRpyTextView;
     private Arm mArm;
     private float mRoll;
     private float mPitch;
@@ -51,6 +50,7 @@ public class CollectionDemoActivity extends FragmentActivity {
     // when zooming, substract this constant from the roll for
     // more natural arm position when zooming
     private final float ROLL_CORRECTION = 28;
+    private static SupportMapFragment mapFragment;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide fragments representing
      * each object in a collection. We use a {@link android.support.v4.app.FragmentStatePagerAdapter}
@@ -134,6 +134,7 @@ public class CollectionDemoActivity extends FragmentActivity {
                     fragment = new MyMapFragment();
                     break;
                 default:
+                    Log.v(LOG_TAG, String.valueOf(i));
                     fragment = new DemoObjectFragment();
                     Bundle args = new Bundle();
                     args.putInt(DemoObjectFragment.ARG_OBJECT, i + 1); // Our object is just an integer :-P
@@ -158,46 +159,6 @@ public class CollectionDemoActivity extends FragmentActivity {
     /**
      * A dummy fragment representing a section of the app, but that simply displays dummy text.
      */
-    public static class DemoObjectFragment extends Fragment {
-
-        public static final String ARG_OBJECT = "object";
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_collection_object, container, false);
-            Bundle args = getArguments();
-//            ((TextView) rootView.findViewById(android.R.id.text1)).setText(
-//                    Integer.toString(args.getInt(ARG_OBJECT)));
-
-            rootView.findViewById(R.id.scan_button).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onScanActionSelected();
-                }
-            });
-            return rootView;
-        }
-
-        private void onScanActionSelected() {
-            // Launch the ScanActivity to scan for Myos to connect to.
-            Intent intent = new Intent(getActivity(), ScanActivity.class);
-            startActivity(intent);
-        }
-    }
-
-    public static class MyMapFragment extends com.google.android.gms.maps.MapFragment {
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            return super.onCreateView(inflater, container, savedInstanceState);
-        }
-
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-        }
-    }
-
 
     // Classes that inherit from AbstractDeviceListener can be used to receive events from Myo devices.
     // If you do not override an event, the default behavior is to do nothing.
@@ -206,45 +167,51 @@ public class CollectionDemoActivity extends FragmentActivity {
         @Override
         public void onConnect(Myo myo, long timestamp) {
             // Set the text color of the text view to cyan when a Myo connects.
-            mGestureTextView.setTextColor(Color.CYAN);
+            //mGestureTextView.setTextColor(Color.CYAN);
         }
+
         // onDisconnect() is called whenever a Myo has been disconnected.
         @Override
         public void onDisconnect(Myo myo, long timestamp) {
             // Set the text color of the text view to red when a Myo disconnects.
-            mGestureTextView.setTextColor(Color.RED);
+            //mGestureTextView.setTextColor(Color.RED);
         }
+
         // onArmSync() is called whenever Myo has recognized a Sync Gesture after someone has put it on their
         // arm. This lets Myo know which arm it's on and which way it's facing.
         @Override
         public void onArmSync(Myo myo, long timestamp, Arm arm, XDirection xDirection) {
             mArm = myo.getArm();
-            if (mArm == Arm.LEFT){
-                mGestureTextView.setText(R.string.arm_left);
+            if (mArm == Arm.LEFT) {
+                //mGestureTextView.setText(R.string.arm_left);
             } else {
-                mGestureTextView.setText(R.string.arm_right);
+                //mGestureTextView.setText(R.string.arm_right);
             }
         }
+
         // onArmUnsync() is called whenever Myo has detected that it was moved from a stable position on a person's arm after
         // it recognized the arm. Typically this happens when someone takes Myo off of their arm, but it can also happen
         // when Myo is moved around on the arm.
         @Override
         public void onArmUnsync(Myo myo, long timestamp) {
             mArm = Arm.UNKNOWN;
-            mGestureTextView.setText(R.string.hello_world);
+            //mGestureTextView.setText(R.string.hello_world);
         }
+
         // onUnlock() is called whenever a synced Myo has been unlocked. Under the standard locking
         // policy, that means poses will now be delivered to the listener.
         @Override
         public void onUnlock(Myo myo, long timestamp) {
 //            mLockStateTextView.setText(R.string.unlocked);
         }
+
         // onLock() is called whenever a synced Myo has been locked. Under the standard locking
         // policy, that means poses will no longer be delivered to the listener.
         @Override
         public void onLock(Myo myo, long timestamp) {
 //            mLockStateTextView.setText(R.string.locked);
         }
+
         // onOrientationData() is called whenever a Myo provides its current orientation,
         // represented as a quaternion.
         @Override
@@ -279,7 +246,6 @@ public class CollectionDemoActivity extends FragmentActivity {
 //                float relYaw = mYaw - mYawOnSpread;
 //                float scrollYaw =  -relYaw * 150;
 //                float scrollPitch = mPitch * 150 ;
-//                //TODO FIX PLS YASEN
 //                // Creates a CameraPosition from the builder
 //                mMap.animateCamera(CameraUpdateFactory.scrollBy(scrollYaw, scrollPitch));
 //
@@ -289,48 +255,49 @@ public class CollectionDemoActivity extends FragmentActivity {
 //            // Next, we apply a rotation to the text view using the roll, pitch, and yaw.
 //            mRpyTextView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nyaw: " + mYaw);
         }
+
         // onPose() is called whenever a Myo provides a new pose.
         @Override
         public void onPose(Myo myo, long timestamp, Pose pose) {
             // Handle the cases of the Pose enumeration, and change the text of the text view
             // based on the pose we receive.
 //            if (mMap != null) {
-                switch (pose) {
-                    case UNKNOWN:
-                        mGestureTextView.setText(getString(R.string.hello_world));
-                        break;
-                    case REST:
-                    case DOUBLE_TAP:
-                        int restTextId = R.string.hello_world;
-                        switch (myo.getArm()) {
-                            case LEFT:
-                                restTextId = R.string.arm_left;
-                                break;
-                            case RIGHT:
-                                restTextId = R.string.arm_right;
-                                break;
-                        }
-                        mGestureTextView.setText(getString(restTextId));
-                        break;
-                    case FIST:
-                        //mMap.animateCamera(CameraUpdateFactory.zoomBy(mRoll));
-                        mGestureTextView.setText(getString(R.string.pose_fist));
-                        break;
-                    case WAVE_IN:
-                        //mMap.animateCamera(CameraUpdateFactory.zoomOut());
-                        mGestureTextView.setText(getString(R.string.pose_wavein));
-                        mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1, true);
-                        break;
-                    case WAVE_OUT:
-                        //mMap.animateCamera(CameraUpdateFactory.scrollBy(((float) 60.5), (float) 45.5));
-                        mGestureTextView.setText(getString(R.string.pose_waveout));
-                        mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1, true);
-                        break;
-                    case FINGERS_SPREAD:
-                        //mMap.animateCamera(CameraUpdateFactory.scrollBy(((float) -60.5), (float) -45.5));
-                        mGestureTextView.setText(getString(R.string.pose_fingersspread));
+            switch (pose) {
+                case UNKNOWN:
+                    //mGestureTextView.setText(getString(R.string.hello_world));
+                    break;
+                case REST:
+                case DOUBLE_TAP:
+                    int restTextId = R.string.hello_world;
+                    switch (myo.getArm()) {
+                        case LEFT:
+                            restTextId = R.string.arm_left;
+                            break;
+                        case RIGHT:
+                            restTextId = R.string.arm_right;
+                            break;
+                    }
+                    //mGestureTextView.setText(getString(restTextId));
+                    break;
+                case FIST:
+                    //mMap.animateCamera(CameraUpdateFactory.zoomBy(mRoll));
+                    //mGestureTextView.setText(getString(R.string.pose_fist));
+                    break;
+                case WAVE_IN:
+                    //mMap.animateCamera(CameraUpdateFactory.zoomOut());
+                    //mGestureTextView.setText(getString(R.string.pose_wavein));
+                    mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1, true);
+                    break;
+                case WAVE_OUT:
+                    //mMap.animateCamera(CameraUpdateFactory.scrollBy(((float) 60.5), (float) 45.5));
+                    //mGestureTextView.setText(getString(R.string.pose_waveout));
+                    mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1, true);
+                    break;
+                case FINGERS_SPREAD:
+                    //mMap.animateCamera(CameraUpdateFactory.scrollBy(((float) -60.5), (float) -45.5));
+                    //mGestureTextView.setText(getString(R.string.pose_fingersspread));
 //                        mUpdateYawOnSpread = true;
-                        break;
+                    break;
 //                }
             }
             if (pose != Pose.UNKNOWN && pose != Pose.REST) {
@@ -348,8 +315,47 @@ public class CollectionDemoActivity extends FragmentActivity {
         }
     };
 
+    public static class MyMapFragment extends com.google.android.gms.maps.SupportMapFragment {
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            super.onCreateView(inflater, container, savedInstanceState);
+            View rootView = inflater.inflate(R.layout.fragment_map, container, false);
+
+            Button scanButton = (Button) rootView.findViewById(R.id.scan_button);
+            scanButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onScanActionSelected();
+                }
+            });
+
+            return rootView;
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setHasOptionsMenu(true);
+            FragmentManager fm = getChildFragmentManager();
+            mapFragment = (SupportMapFragment) fm.findFragmentById(R.id.map);
+            if (mapFragment == null) {
+                mapFragment = SupportMapFragment.newInstance();
+                fm.beginTransaction().replace(R.id.map, mapFragment).commit();
+                mapFragment.getMapAsync(new OnMapReadyCallback() {
+                    @Override
+                    public void onMapReady(GoogleMap map) {
+                        mMap = map;
+                    }
+                });
+            }
+        }
 
 
-
-
+        //temp delete after, not sure how to add menu at the moment
+        private void onScanActionSelected() {
+            // Launch the ScanActivity to scan for Myos to connect to.
+            Intent intent = new Intent(getActivity(), ScanActivity.class);
+            startActivity(intent);
+        }
+    }
 }
