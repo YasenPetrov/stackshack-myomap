@@ -1,7 +1,9 @@
 package com.example.android.myomap;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -352,6 +354,7 @@ public class CollectionDemoActivity extends FragmentActivity {
     };
 
     public static class MyMapFragment extends com.google.android.gms.maps.SupportMapFragment {
+        CameraPosition mCameraPosition;
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             super.onCreateView(inflater, container, savedInstanceState);
@@ -368,11 +371,12 @@ public class CollectionDemoActivity extends FragmentActivity {
             return rootView;
         }
 
-        @Override
+       @Override
         public void onCreate(Bundle savedInstanceState) {
+            Log.v(LOG_TAG, "OnCreate");
             super.onCreate(savedInstanceState);
             setHasOptionsMenu(true);
-            final CameraPosition cameraPosition;
+//            final CameraPosition cameraPosition;
             FragmentManager fm = getChildFragmentManager();
             mapFragment = (SupportMapFragment) fm.findFragmentById(R.id.map);
             if (mapFragment == null) {
@@ -380,17 +384,18 @@ public class CollectionDemoActivity extends FragmentActivity {
                 fm.beginTransaction().replace(R.id.map, mapFragment).commit();
 
            if(savedInstanceState != null && savedInstanceState.containsKey(CAMERA_POSITION_KEY)) {
-                    cameraPosition = savedInstanceState.getParcelable(CAMERA_POSITION_KEY);
-                } else cameraPosition = null;
+                    mCameraPosition = savedInstanceState.getParcelable(CAMERA_POSITION_KEY);
+                } else mCameraPosition = null;
                 mapFragment.getMapAsync(new OnMapReadyCallback() {
                     @Override
                     public void onMapReady(GoogleMap map) {
 
                         mMap = map;
-                        if(cameraPosition != null) {
-                            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                        if(mCameraPosition != null) {
+                            Log.v(LOG_TAG, "CameraPos :" + mCameraPosition.toString());
+                            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition));
                         } else {
-                            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(
+                            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(
                                     staLatLng, (float) 14.5, 0, 0)));
                         }
                         setUniMarkers();
