@@ -127,6 +127,8 @@ public class TweetFragment extends Fragment {
         }
 
         startActivity(intent);
+        getFragmentManager().popBackStack();
+
     }
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
