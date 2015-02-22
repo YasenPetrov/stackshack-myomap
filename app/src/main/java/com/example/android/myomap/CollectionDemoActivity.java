@@ -67,6 +67,7 @@ public class CollectionDemoActivity extends FragmentActivity {
     // more natural arm position when zooming
     private final float ROLL_CORRECTION = 36;
     private static SupportMapFragment mapFragment;
+    private static Button scanButton;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide fragments representing
      * each object in a collection. We use a {@link android.support.v4.app.FragmentStatePagerAdapter}
@@ -184,11 +185,13 @@ public class CollectionDemoActivity extends FragmentActivity {
         public void onConnect(Myo myo, long timestamp) {
             // Set the text color of the text view to cyan when a Myo connects.
             //mGestureTextView.setTextColor(Color.CYAN);
+            scanButton.setVisibility(View.INVISIBLE);
         }
 
         // onDisconnect() is called whenever a Myo has been disconnected.
         @Override
         public void onDisconnect(Myo myo, long timestamp) {
+            scanButton.setVisibility(View.VISIBLE);
             // Set the text color of the text view to red when a Myo disconnects.
             //mGestureTextView.setTextColor(Color.RED);
         }
@@ -360,7 +363,7 @@ public class CollectionDemoActivity extends FragmentActivity {
             super.onCreateView(inflater, container, savedInstanceState);
             View rootView = inflater.inflate(R.layout.fragment_map, container, false);
 
-            Button scanButton = (Button) rootView.findViewById(R.id.scan_button);
+            scanButton = (Button) rootView.findViewById(R.id.scan_button);
             scanButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -371,7 +374,7 @@ public class CollectionDemoActivity extends FragmentActivity {
             return rootView;
         }
 
-       @Override
+        @Override
         public void onCreate(Bundle savedInstanceState) {
             Log.v(LOG_TAG, "OnCreate");
             super.onCreate(savedInstanceState);
@@ -412,6 +415,8 @@ public class CollectionDemoActivity extends FragmentActivity {
                 savedInstanceState.putParcelable(CAMERA_POSITION_KEY, mMap.getCameraPosition());
             }
         }
+
+
 
         private void setUniMarkers(){
             mMap.addMarker(new MarkerOptions().position(staLatLng));
