@@ -23,13 +23,6 @@ public class DemoObjectFragment extends Fragment {
         Bundle args = getArguments();
 //            ((TextView) rootView.findViewById(android.R.id.text1)).setText(
 //                    Integer.toString(args.getInt(ARG_OBJECT)));
-
-        rootView.findViewById(R.id.scan_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onScanActionSelected();
-            }
-        });
         return rootView;
     }
 

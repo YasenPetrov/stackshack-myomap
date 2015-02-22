@@ -150,6 +150,9 @@ public class CollectionDemoActivity extends FragmentActivity {
                 case 0:
                     fragment = new MyMapFragment();
                     break;
+                case 1:
+                    fragment = new TweetFragment();
+                    break;
                 default:
                     Log.v(LOG_TAG, String.valueOf(i));
                     fragment = new DemoObjectFragment();
@@ -255,6 +258,7 @@ public class CollectionDemoActivity extends FragmentActivity {
                 mRoll *= -1;
                 mPitch *= -1;
             }
+            Log.v("Our pitch: ", "" + mPitch);
 
 //            mRpyTextView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nrelYaw: " +
 //                    (mYaw - mYawOnSpread));
