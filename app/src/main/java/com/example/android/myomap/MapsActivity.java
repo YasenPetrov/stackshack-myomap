@@ -14,6 +14,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.thalmic.myo.AbstractDeviceListener;
 import com.thalmic.myo.Arm;
 import com.thalmic.myo.DeviceListener;
@@ -36,6 +37,8 @@ public class MapsActivity extends ActionBarActivity {
     private float mYaw;
     private boolean mUpdateYawOnSpread = false;
     private float mYawOnSpread = 0;
+    private String yawText; //temp
+    private String pitchText;
     // when zooming, substract this constant from the roll for
     // more natural arm position when zooming
     private final float ROLL_CORRECTION = 35;
@@ -128,8 +131,7 @@ public class MapsActivity extends ActionBarActivity {
                 mPitch *= -1;
             }
 
-            mRpyTextView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nrelYaw: " +
-                    (mYaw - mYawOnSpread));
+
 
             if(myo.getPose() == Pose.FIST) {
                 if (mMap != null) {
@@ -141,18 +143,25 @@ public class MapsActivity extends ActionBarActivity {
             }
 
              if(myo.getPose() == Pose.FINGERS_SPREAD) {
+                 float maxPitch = 2250;
                  float relYaw = mYaw - mYawOnSpread;
                  float scrollYaw =  -relYaw * 150;
+                 yawText = String.valueOf(scrollYaw);
+
                  float scrollPitch = mPitch * 150 ;
-                //TODO FIX PLS YASEN
+                 if (Math.abs(scrollPitch) > maxPitch){
+                     scrollPitch = maxPitch * Math.signum(scrollPitch); //testing
+                 }
+                 pitchText = String.valueOf(scrollPitch); //temp
                 // Creates a CameraPosition from the builder
                  mMap.animateCamera(CameraUpdateFactory.scrollBy(scrollYaw, scrollPitch));
-
                  //mMap.animateCamera
              }
 //            mMap.animateCamera(CameraUpdateFactory.scrollBy(roll, pitch));
             // Next, we apply a rotation to the text view using the roll, pitch, and yaw.
-            mRpyTextView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nyaw: " + mYaw);
+            //mRpyTextView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nyaw: " + mYaw);
+            mRpyTextView.setText("roll: " + mRoll + "\npitch: " + pitchText + "\nrelYaw: " +
+                    yawText);
         }
         // onPose() is called whenever a Myo provides a new pose.
         @Override
@@ -269,10 +278,20 @@ public class MapsActivity extends ActionBarActivity {
                         public void onMapReady(GoogleMap googleMap) {
                             mMap = googleMap;
                             mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                            //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+                            mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+                                @Override
+                                public void onCameraChange(CameraPosition cameraPosition) {
+                                        float minZoom = 1.5f;
+                                        if (cameraPosition.zoom < minZoom)
+                                            mMap.animateCamera(CameraUpdateFactory.zoomTo(minZoom));
+                                    }
+                                }
+                            );
                         }
+
                     });
         }
+
     }
 
 }

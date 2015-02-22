@@ -23,7 +23,7 @@ dependencies {
     repositories {
         mavenLocal()
         maven {
-            url "myo-android-sdk-0.10.0/myorepository" //put this myo-android....... in /app/ folder
+            url "myo-android-sdk-0.10.0/myorepository"
         }
     }
     compile('com.thalmic:myosdk:0.10.+@aar')
