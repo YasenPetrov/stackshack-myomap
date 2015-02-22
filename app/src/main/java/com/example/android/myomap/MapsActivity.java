@@ -152,12 +152,14 @@ public class MapsActivity extends ActionBarActivity {
             }
 
             if (myo.getPose() == Pose.FINGERS_SPREAD) {
-                mMap.stopAnimation();
+                if(mMap != null) {
+                    mMap.stopAnimation();
+                }
                 float maxPitch = 2200;
                 float maxYaw = 2200;
                 float relYaw = mYaw - mYawOnSpread;
                 float scrollYaw = -relYaw * 150;
-                yawText = String.valueOf(scrollYaw);
+//                yawText = String.valueOf(scrollYaw);
                 float scrollPitch = mPitch * 150;
                 if (Math.abs(scrollPitch) > maxPitch) {
                     Log.v(LOG_TAG, "Pitch ping: " + scrollPitch);
@@ -168,9 +170,9 @@ public class MapsActivity extends ActionBarActivity {
                     scrollYaw = maxYaw * Math.signum(scrollYaw);
                 }
                 mMap.animateCamera(CameraUpdateFactory.scrollBy(scrollYaw, scrollPitch));
-                pitchText = String.valueOf(scrollPitch);
-                mRpyTextView.setText("Spread:\n" + "roll: " + mRoll + "\npitch: " + pitchText + "\nscrollYaw: " +
-                        yawText + "\nyawOnSpread :" + mYawOnSpread + "\nrelYaw: " + relYaw);
+//                pitchText = String.valueOf(scrollPitch);
+//                mRpyTextView.setText("Spread:\n" + "roll: " + mRoll + "\npitch: " + pitchText + "\nscrollYaw: " +
+//                        yawText + "\nyawOnSpread :" + mYawOnSpread + "\nrelYaw: " + relYaw);
             }
         }
 
@@ -187,7 +189,7 @@ public class MapsActivity extends ActionBarActivity {
                 mMap.stopAnimation();
                 switch (pose) {
                     case UNKNOWN:
-                        mGestureTextView.setText(getString(R.string.hello_world));
+//                        mGestureTextView.setText(getString(R.string.hello_world));
                         break;
 
                     case REST:
