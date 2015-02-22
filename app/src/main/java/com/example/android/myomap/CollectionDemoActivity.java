@@ -1,6 +1,5 @@
 package com.example.android.myomap;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -43,6 +42,7 @@ public class CollectionDemoActivity extends FragmentActivity {
     private TextView mLockStateTextView;
     private TextView mRpyTextView;
 
+    private static final String CAMERA_POSITION_KEY = "cameraPosition";
     private static final String LOG_TAG = CollectionDemoActivity.class.getSimpleName();
 
     private static GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -58,6 +58,9 @@ public class CollectionDemoActivity extends FragmentActivity {
     private boolean mUpdateYawOnSpread = false;
     private String yawText; //temp
     private String pitchText;
+    private static final LatLng staLatLng = new LatLng(56.340107, -2.808320);
+    private static final LatLng ediLatLng = new LatLng(55.944184, -3.186597);
+    private static final LatLng glaLatLng = new LatLng(55.871706, -4.287941);
     // when zooming, substract this constant from the roll for
     // more natural arm position when zooming
     private final float ROLL_CORRECTION = 36;
@@ -375,15 +378,13 @@ public class CollectionDemoActivity extends FragmentActivity {
             if (mapFragment == null) {
                 mapFragment = SupportMapFragment.newInstance();
                 fm.beginTransaction().replace(R.id.map, mapFragment).commit();
-                if(savedInstanceState != null && savedInstanceState.containsKey("cameraPosition")) {
-                    cameraPosition = savedInstanceState.getParcelable("cameraPostion");
+                if(savedInstanceState != null && savedInstanceState.containsKey(CAMERA_POSITION_KEY)) {
+                    cameraPosition = savedInstanceState.getParcelable(CAMERA_POSITION_KEY);
                 } else cameraPosition = null;
                 mapFragment.getMapAsync(new OnMapReadyCallback() {
                     @Override
                     public void onMapReady(GoogleMap map) {
-                        LatLng staLatLng = new LatLng(56.340107, -2.808320);
-                        LatLng ediLatLng = new LatLng(55.944184, -3.186597);
-                        LatLng glaLatLng = new LatLng(55.871706, -4.287941);
+
                         mMap = map;
                         if(cameraPosition != null) {
                             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
@@ -391,9 +392,7 @@ public class CollectionDemoActivity extends FragmentActivity {
                             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(
                                     staLatLng, (float) 14.5, 0, 0)));
                         }
-                        mMap.addMarker(new MarkerOptions().position(staLatLng));
-                        mMap.addMarker(new MarkerOptions().position(ediLatLng));
-                        mMap.addMarker(new MarkerOptions().position(glaLatLng));
+                        setUniMarkers();
                     }
                 });
             }
@@ -403,7 +402,15 @@ public class CollectionDemoActivity extends FragmentActivity {
         @Override
         public void onSaveInstanceState(Bundle savedInstanceState) {
             super.onSaveInstanceState(savedInstanceState);
-            savedInstanceState.putParcelable("cameraPosition", mMap.getCameraPosition());
+            if (mMap != null) {
+                savedInstanceState.putParcelable(CAMERA_POSITION_KEY, mMap.getCameraPosition());
+            }
+        }
+
+        private void setUniMarkers(){
+            mMap.addMarker(new MarkerOptions().position(staLatLng));
+            mMap.addMarker(new MarkerOptions().position(ediLatLng));
+            mMap.addMarker(new MarkerOptions().position(glaLatLng));
         }
 
         //temp delete after, not sure how to add menu at the moment
