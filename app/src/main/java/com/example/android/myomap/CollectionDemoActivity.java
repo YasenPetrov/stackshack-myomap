@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -37,12 +36,15 @@ import com.thalmic.myo.scanner.ScanActivity;
 
 public class CollectionDemoActivity extends FragmentActivity {
 
+    private final static int SLIDING_FRAGMENTS = 3;
 
-    private TextView mGestureTextView;
-    private TextView mLockStateTextView;
-    private TextView mRpyTextView;
-
+    // when zooming, substract this constant from the roll for
+    // more natural arm position when zooming
+    private final float ROLL_CORRECTION = 36;
     private static final String CAMERA_POSITION_KEY = "cameraPosition";
+    private static final LatLng staLatLng = new LatLng(56.340107, -2.808320);
+    private static final LatLng ediLatLng = new LatLng(55.944184, -3.186597);
+    private static final LatLng glaLatLng = new LatLng(55.871706, -4.287941);
     private static final String LOG_TAG = CollectionDemoActivity.class.getSimpleName();
 
     private static GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -56,18 +58,10 @@ public class CollectionDemoActivity extends FragmentActivity {
     private float mYaw;
     private float mYawOnSpread = 0;
     private boolean mUpdateYawOnSpread = false;
-    private String yawText; //temp
-    private String pitchText;
-    private static final LatLng staLatLng = new LatLng(56.340107, -2.808320);
-    private static final LatLng ediLatLng = new LatLng(55.944184, -3.186597);
-    private static final LatLng glaLatLng = new LatLng(55.871706, -4.287941);
-    // when zooming, substract this constant from the roll for
-    // more natural arm position when zooming
-    private final float ROLL_CORRECTION = 36;
+
     private static SupportMapFragment mapFragment;
     private static Button scanButton;
-    ////////////////////////////////////////////////
-    private final static int SLIDING_FRAGMENTS = 3;
+
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide fragments representing
      * each object in a collection. We use a {@link android.support.v4.app.FragmentStatePagerAdapter}
@@ -192,8 +186,6 @@ public class CollectionDemoActivity extends FragmentActivity {
         // onConnect() is called whenever a Myo has been connected.
         @Override
         public void onConnect(Myo myo, long timestamp) {
-            // Set the text color of the text view to cyan when a Myo connects.
-            //mGestureTextView.setTextColor(Color.CYAN);
             scanButton.setVisibility(View.INVISIBLE);
         }
 
@@ -201,8 +193,6 @@ public class CollectionDemoActivity extends FragmentActivity {
         @Override
         public void onDisconnect(Myo myo, long timestamp) {
             scanButton.setVisibility(View.VISIBLE);
-            // Set the text color of the text view to red when a Myo disconnects.
-            //mGestureTextView.setTextColor(Color.RED);
         }
 
         // onArmSync() is called whenever Myo has recognized a Sync Gesture after someone has put it on their
@@ -293,7 +283,6 @@ public class CollectionDemoActivity extends FragmentActivity {
                 }
                 mMap.animateCamera(CameraUpdateFactory.scrollBy(scrollYaw, scrollPitch));
 
-                //mMap.animateCamera
             }
 //            mMap.animateCamera(CameraUpdateFactory.scrollBy(roll, pitch));
             // Next, we apply a rotation to the text view using the roll, pitch, and yaw.
