@@ -104,7 +104,7 @@ public class TweetFragment extends Fragment {
         if(cursorButton. getTop() <= likeButton.getBottom()) {
             sendTweet("You're epic!");
         }
-        if(cursorButton. getBottom() <= hateButton.getTop()) {
+        if(cursorButton. getBottom() >= hateButton.getTop()) {
             sendTweet("You guys suck!");
         }
     }
@@ -125,10 +125,8 @@ public class TweetFragment extends Fragment {
                 intent.setPackage(info.activityInfo.packageName);
             }
         }
-
+        //need to remove from backstack
         startActivity(intent);
-        getFragmentManager().popBackStack();
-
     }
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

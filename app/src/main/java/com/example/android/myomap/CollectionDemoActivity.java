@@ -173,8 +173,15 @@ public class CollectionDemoActivity extends FragmentActivity {
         }
 
         @Override
-        public CharSequence getPageTitle(int position) {
-            return "OBJECT " + (position + 1);
+        public CharSequence getPageTitle(int pos) {
+            switch (pos){
+                case 0:
+                    return "MAP";
+                case 1:
+                    return "TWEET AT US";
+                default:
+                    return "TOP SECRET";
+            }
         }
     }
 
@@ -254,7 +261,7 @@ public class CollectionDemoActivity extends FragmentActivity {
                 mRoll *= -1;
                 mPitch *= -1;
             }
-            Log.v("Our pitch: ", "" + mPitch);
+            //Log.v("Our pitch: ", "" + mPitch);
 
             // Move cursor in tweet fragment
             if(mViewPager.getCurrentItem() == 1 && myo.getPose() == Pose.FIST) {

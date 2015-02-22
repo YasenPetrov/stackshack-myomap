@@ -23,7 +23,6 @@
         android:gravity="center"
         android:textSize="128sp"
         android:padding="32dp"
-        android:id="@+id/gesture_textview"
-        android:hint="sdfsa" />
+        android:id="@+id/gesture_textview" />
 
 </FrameLayout>
