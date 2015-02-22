@@ -4,5 +4,6 @@
     tools:context="com.example.android.myomap.MapsActivity">
     <item android:id="@+id/action_scan"
         android:title="@string/myosdk__action_scan"
-        android:orderInCategory="100" app:showAsAction="always" />
+        android:orderInCategory="100"
+        app:showAsAction="always" />
 </menu>
