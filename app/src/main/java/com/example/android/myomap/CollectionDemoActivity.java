@@ -1,9 +1,7 @@
 package com.example.android.myomap;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -68,6 +66,8 @@ public class CollectionDemoActivity extends FragmentActivity {
     private final float ROLL_CORRECTION = 36;
     private static SupportMapFragment mapFragment;
     private static Button scanButton;
+    ////////////////////////////////////////////////
+    private final static int SLIDING_FRAGMENTS = 3;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide fragments representing
      * each object in a collection. We use a {@link android.support.v4.app.FragmentStatePagerAdapter}
@@ -164,7 +164,7 @@ public class CollectionDemoActivity extends FragmentActivity {
         @Override
         public int getCount() {
             // For this contrived example, we have a 100-object collection.
-            return 100;
+            return SLIDING_FRAGMENTS;
         }
 
         @Override
