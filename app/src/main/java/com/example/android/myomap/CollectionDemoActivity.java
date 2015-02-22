@@ -163,13 +163,19 @@ public class CollectionDemoActivity extends FragmentActivity {
 
         @Override
         public int getCount() {
-            // For this contrived example, we have a 100-object collection.
             return SLIDING_FRAGMENTS;
         }
 
         @Override
-        public CharSequence getPageTitle(int position) {
-            return "OBJECT " + (position + 1);
+        public CharSequence getPageTitle(int pos) {
+            switch (pos){
+                case 0:
+                    return "MAP";
+                case 1:
+                    return "TWEET AT US";
+                default:
+                    return "OBJECT " + (pos + 1);
+            }
         }
     }
 
