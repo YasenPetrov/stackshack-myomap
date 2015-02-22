@@ -1,6 +1,8 @@
 package com.example.android.myomap;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -15,8 +17,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import java.util.List;
 
 
 /**
@@ -28,6 +33,8 @@ import android.widget.Toast;
  * create an instance of this fragment.
  */
 public class TweetFragment extends Fragment {
+
+    private final String LOG_TAG = TweetFragment.class.getSimpleName();
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -36,6 +43,10 @@ public class TweetFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private Button cursorButton;
+    private Button likeButton;
+    private Button hateButton;
 
     private OnFragmentInteractionListener mListener;
 
@@ -75,20 +86,55 @@ public class TweetFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         final View rootView = inflater.inflate(R.layout.fragment_tweet, container, false);
-        rootView.findViewById(R.id.tweet_button).setOnClickListener(new View.OnClickListener() {
+        cursorButton = (Button) rootView.findViewById(R.id.tweet_button);
+        likeButton = (Button) rootView.findViewById(R.id.like_button);
+        hateButton = (Button) rootView.findViewById(R.id.hate_button);
+        cursorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //new HeightAnimation(v, 200, 300).applyTransformation((float) 3, new Transformation());
                 Log.v("aFa: ", "" + v.getBottom());
                 v.setBottom(v.getBottom() + 100);
                 v.setTop(v.getTop() + 100);
-                Log.v("aFa: ", "" + v.getBottom());
-                if(v.getBottom() >= rootView.findViewById(R.id.hate_button).getTop()) {
-                    Toast.makeText(getActivity(), "Profit!", Toast.LENGTH_SHORT);
+                Log.v("aFa: ", "vBottom" + v.getBottom() + " hateTop: " + rootView.findViewById(R.id.hate_button).getTop());
+
+                if (v.getBottom() >= rootView.findViewById(R.id.hate_button).getTop()) {
+                    Toast.makeText(getActivity(), "Profit!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
         return rootView;
+    }
+
+    public void moveCursorButton(int value) {
+        cursorButton.setBottom(cursorButton.getBottom() + value);
+        cursorButton.setTop(cursorButton.getTop() + value);
+        if(cursorButton. getTop() <= likeButton.getBottom()) {
+            sendTweet("You're epic!");
+        }
+        if(cursorButton. getBottom() <= hateButton.getTop()) {
+            sendTweet("You guys suck!");
+        }
+    }
+
+
+    private void sendTweet(String tweetBody) {
+        Log.v(LOG_TAG, "tweet!");
+        String tweetString = "#myomap @stacshack\n" + tweetBody;
+        String tweetUrl =
+                String.format("https://twitter.com/intent/tweet?text=%s",
+                        Utility.urlEncode(tweetString));
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(tweetUrl));
+
+        // Narrow down to official Twitter app, if available:
+        List<ResolveInfo> matches = getActivity().getPackageManager().queryIntentActivities(intent, 0);
+        for (ResolveInfo info : matches) {
+            if (info.activityInfo.packageName.toLowerCase().startsWith("com.twitter")) {
+                intent.setPackage(info.activityInfo.packageName);
+            }
+        }
+
+        startActivity(intent);
     }
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

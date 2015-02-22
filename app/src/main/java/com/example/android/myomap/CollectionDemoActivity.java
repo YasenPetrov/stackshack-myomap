@@ -66,6 +66,7 @@ public class CollectionDemoActivity extends FragmentActivity {
     private final float ROLL_CORRECTION = 36;
     private static SupportMapFragment mapFragment;
     private static Button scanButton;
+    private static TweetFragment mTweetFragment;
     ////////////////////////////////////////////////
     private final static int SLIDING_FRAGMENTS = 3;
     /**
@@ -152,6 +153,7 @@ public class CollectionDemoActivity extends FragmentActivity {
                     break;
                 case 1:
                     fragment = new TweetFragment();
+                    mTweetFragment = (TweetFragment) fragment;
                     break;
                 default:
                     Log.v(LOG_TAG, String.valueOf(i));
@@ -253,6 +255,11 @@ public class CollectionDemoActivity extends FragmentActivity {
                 mPitch *= -1;
             }
             Log.v("Our pitch: ", "" + mPitch);
+
+            // Move cursor in tweet fragment
+            if(mViewPager.getCurrentItem() == 1 && myo.getPose() == Pose.FIST) {
+                mTweetFragment.moveCursorButton((int) mPitch);
+            }
 
 //            mRpyTextView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nrelYaw: " +
 //                    (mYaw - mYawOnSpread));
