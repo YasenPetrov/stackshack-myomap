@@ -13,4 +13,5 @@
     <string name="pose_wavein">Wave in</string>
     <string name="pose_waveout">Wave out</string>
     <string name="pose_fingersspread">Fingers spread</string>
+    <string name="action_scan_myo">Scan for Myo</string>
 </resources>
