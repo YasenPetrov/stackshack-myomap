@@ -376,7 +376,7 @@ public class CollectionDemoActivity extends FragmentActivity {
                 mapFragment = SupportMapFragment.newInstance();
                 fm.beginTransaction().replace(R.id.map, mapFragment).commit();
                 if(savedInstanceState != null && savedInstanceState.containsKey("cameraPosition")) {
-                    cameraPosition = savedInstanceState.getParcelable("cameraPostion");
+                    cameraPosition = savedInstanceState.getParcelable("cameraPosition");
                 } else cameraPosition = null;
                 mapFragment.getMapAsync(new OnMapReadyCallback() {
                     @Override
@@ -405,6 +405,7 @@ public class CollectionDemoActivity extends FragmentActivity {
             super.onSaveInstanceState(savedInstanceState);
             savedInstanceState.putParcelable("cameraPosition", mMap.getCameraPosition());
         }
+
 
         //temp delete after, not sure how to add menu at the moment
         private void onScanActionSelected() {
