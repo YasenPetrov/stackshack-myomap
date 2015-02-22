@@ -271,7 +271,7 @@ public class CollectionDemoActivity extends FragmentActivity {
                 float relYaw = mYaw - mYawOnSpread;
                 float scrollYaw = -relYaw * 170;
 //                yawText = String.valueOf(scrollYaw)
-                float scrollPitch = mPitch * 170;
+                float scrollPitch = mPitch * 210;
                 Log.v(LOG_TAG, ("mYaw :" + mYaw + "\nmYawOnSpread: " + mYawOnSpread + "\n scrollYaw: " + scrollYaw));
                 if (Math.abs(scrollPitch) > maxPitch) {
                     Log.v(LOG_TAG, "Pitch ping: " + scrollPitch);
