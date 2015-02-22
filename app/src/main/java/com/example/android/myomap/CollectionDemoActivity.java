@@ -35,7 +35,7 @@ public class CollectionDemoActivity extends FragmentActivity {
 
 
     private static final String LOG_TAG = "MapActivity says: ";
-
+    
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private TextView mGestureTextView;
     private TextView mLockStateTextView;
