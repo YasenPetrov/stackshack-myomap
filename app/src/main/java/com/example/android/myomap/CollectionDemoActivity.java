@@ -62,6 +62,9 @@ public class CollectionDemoActivity extends FragmentActivity {
     private static SupportMapFragment mapFragment;
     private static Button scanButton;
 
+
+    private static TweetFragment mTweetFragment;
+
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide fragments representing
      * each object in a collection. We use a {@link android.support.v4.app.FragmentStatePagerAdapter}
@@ -146,6 +149,7 @@ public class CollectionDemoActivity extends FragmentActivity {
                     break;
                 case 1:
                     fragment = new TweetFragment();
+                    mTweetFragment = (TweetFragment) fragment;
                     break;
                 default:
                     Log.v(LOG_TAG, String.valueOf(i));
@@ -171,7 +175,7 @@ public class CollectionDemoActivity extends FragmentActivity {
                 case 1:
                     return "TWEET AT US";
                 default:
-                    return "OBJECT " + (pos + 1);
+                    return "TOP SECRET";// + (pos + 1);
             }
         }
     }
@@ -249,6 +253,11 @@ public class CollectionDemoActivity extends FragmentActivity {
                 mPitch *= -1;
             }
             Log.v("Our pitch: ", "" + mPitch);
+
+            // Move cursor in tweet fragment
+            if(mViewPager.getCurrentItem() == 1 && myo.getPose() == Pose.FIST) {
+                mTweetFragment.moveCursorButton((int) mPitch);
+            }
 
 //            mRpyTextView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nrelYaw: " +
 //                    (mYaw - mYawOnSpread));
