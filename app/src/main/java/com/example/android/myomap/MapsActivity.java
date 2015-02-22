@@ -41,7 +41,6 @@ public class MapsActivity extends ActionBarActivity {
     private float mYawOnSpread = 0;
     private String yawText; //temp
     private String pitchText;
-    private Pose mLastPose = Pose.UNKNOWN;
     // when zooming, substract this constant from the roll for
     // more natural arm position when zooming
     private final float ROLL_CORRECTION = 28;
