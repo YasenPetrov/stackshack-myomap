@@ -1,13 +1,7 @@
 package com.example.android.myomap;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,7 +12,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.util.List;
@@ -92,7 +85,6 @@ public class TweetFragment extends Fragment {
         cursorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //new HeightAnimation(v, 200, 300).applyTransformation((float) 3, new Transformation());
                 Log.v("aFa: ", "" + v.getBottom());
                 v.setBottom(v.getBottom() + 100);
                 v.setTop(v.getTop() + 100);
