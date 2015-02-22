@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
@@ -26,6 +27,8 @@ import com.thalmic.myo.scanner.ScanActivity;
 
 public class MapsActivity extends ActionBarActivity {
 
+    private static final String LOG_TAG = "MapActivity says: ";
+
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private TextView mGestureTextView;
     private TextView mLockStateTextView;
@@ -38,9 +41,10 @@ public class MapsActivity extends ActionBarActivity {
     private float mYawOnSpread = 0;
     private String yawText; //temp
     private String pitchText;
+    private Pose mLastPose = Pose.UNKNOWN;
     // when zooming, substract this constant from the roll for
     // more natural arm position when zooming
-    private final float ROLL_CORRECTION = 20;
+    private final float ROLL_CORRECTION = 28;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,8 +140,12 @@ public class MapsActivity extends ActionBarActivity {
                 mPitch *= -1;
             }
 
+            mRpyTextView.setText("roll: " + mRoll + "\npitch: " + mPitch + "\nyaw: " +
+                    mYaw);
+
             if (myo.getPose() == Pose.FIST) {
                 if (mMap != null) {
+                    Log.v(LOG_TAG, "FIST!");
                     float zoomRoll = (mRoll - ROLL_CORRECTION) / 10; //i changed to 20 i have to try way too hard w 30
                     mMap.stopAnimation();
                     mMap.animateCamera(CameraUpdateFactory.zoomBy(zoomRoll));
@@ -145,20 +153,25 @@ public class MapsActivity extends ActionBarActivity {
             }
 
             if (myo.getPose() == Pose.FINGERS_SPREAD) {
-                float maxPitch = 2250;
+                mMap.stopAnimation();
+                float maxPitch = 2200;
+                float maxYaw = 2200;
                 float relYaw = mYaw - mYawOnSpread;
                 float scrollYaw = -relYaw * 150;
                 yawText = String.valueOf(scrollYaw);
-
                 float scrollPitch = mPitch * 150;
                 if (Math.abs(scrollPitch) > maxPitch) {
+                    Log.v(LOG_TAG, "Pitch ping: " + scrollPitch);
                     scrollPitch = maxPitch * Math.signum(scrollPitch);
                 }
-                mMap.stopAnimation();
+                if (Math.abs(scrollYaw) > maxYaw) {
+                    Log.v(LOG_TAG, "Yaw ping: " + scrollYaw);
+                    scrollYaw = maxYaw * Math.signum(scrollYaw);
+                }
                 mMap.animateCamera(CameraUpdateFactory.scrollBy(scrollYaw, scrollPitch));
                 pitchText = String.valueOf(scrollPitch);
-                mRpyTextView.setText("roll: " + mRoll + "\npitch: " + pitchText + "\nrelYaw: " +
-                        yawText);
+                mRpyTextView.setText("Spread:\n" + "roll: " + mRoll + "\npitch: " + pitchText + "\nscrollYaw: " +
+                        yawText + "\nyawOnSpread :" + mYawOnSpread + "\nrelYaw: " + relYaw);
             }
         }
 
@@ -167,7 +180,12 @@ public class MapsActivity extends ActionBarActivity {
         public void onPose(Myo myo, long timestamp, Pose pose) {
             // Handle the cases of the Pose enumeration, and change the text of the text view
             // based on the pose we receive.
+
             if (mMap != null) {
+//                if(mLastPose == Pose.FINGERS_SPREAD) {
+//                    mMap.stopAnimation();
+//                }
+                mMap.stopAnimation();
                 switch (pose) {
                     case UNKNOWN:
                         mGestureTextView.setText(getString(R.string.hello_world));
